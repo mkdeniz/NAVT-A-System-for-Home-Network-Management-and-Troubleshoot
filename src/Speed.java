@@ -44,6 +44,7 @@ public class Speed {
     
     static double cal(int c, Date d) {
         double s = (c/1);
+        s = s;
         return s/1024;
     }
     
