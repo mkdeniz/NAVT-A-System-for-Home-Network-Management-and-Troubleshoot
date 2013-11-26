@@ -44,8 +44,7 @@ public class Speed {
     
     static double cal(int c, Date d) {
         double s = (c/1);
-        s = s/1024;
-        return s;
+        return s/1024;
     }
     
     public static void doGraph() throws RrdException, IOException {
