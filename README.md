@@ -1,8 +1,5 @@
 A System for Home Network Analysis, Visualisation and Troubleshooting
 ---------------------------------------------------------------------
-
-Description:
-------------
 Home networks are becoming increasingly complex to manage and troubleshoot due to the presence of wireless and 
 the plethora of devices that connect to them. Especially for the non-expert user, identifying the state of the
 network at any given time can be cumbersome and sometimes impossible. Even though home network gateways and 
