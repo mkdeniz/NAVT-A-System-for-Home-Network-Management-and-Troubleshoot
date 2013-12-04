@@ -36,16 +36,11 @@ public class Speed {
     private static final String rrd = "file.rrd";
     private static final long START = Util.getTimestamp();
     private static Date end = new Date(START);
-    private String graphTitle;
     static int t12 = 0;
     JButton redButton;
-    private String graphXLabel;
-    private String graphYLabel;
     
-    static double cal(int c, Date d) {
-        double s = (c/1);
-        s = s;
-        return s/1024;
+    static double cal(int c) {
+        return (c/1)/1024;
     }
     
     public static void doGraph() throws RrdException, IOException {
@@ -67,9 +62,9 @@ public class Speed {
         gDef = new RrdGraphDef();
         gDef.setTimePeriod(START - 10, START);
         gDef.setImageBorder(Color.WHITE, 0);
-        gDef.setTitle(graphTitle);
-        gDef.setVerticalLabel(graphYLabel);
-        gDef.setTimeAxisLabel(graphXLabel);
+        gDef.setTitle("Bandiwth");
+        gDef.setVerticalLabel("Speed");
+        gDef.setTimeAxisLabel("Time");
         gDef.datasource("a", rrd, "a", "AVERAGE", "MEMORY");
         gDef.datasource( "avg", "a", "AVERAGE");
         gDef.line("a", Color.decode("0xb6e4"), "Real");
@@ -103,19 +98,13 @@ public class Speed {
         frame.setVisible(true);
     }
     
-    public Speed(int interval, String graphTitle, String graphYLabel, String graphXLabel) throws IOException, RrdException {
-        this.graphTitle = graphTitle;
-        this.graphXLabel = graphXLabel;
-        this.graphYLabel = graphYLabel;
+    public Speed(int interval) throws IOException, RrdException {
         this.prepareFrame();
         List<PcapIf> alldevs = new ArrayList<>(); // Will be filled with NICs  
         StringBuilder errbuf = new StringBuilder(); // For any error msgs  
-  
-        /*************************************************************************** 
-         * First get a list of devices on this system 
-         **************************************************************************/  
+        
         int r = Pcap.findAllDevs(alldevs, errbuf);  
-        if (r == Pcap.NOT_OK || alldevs.isEmpty()) {  
+        if (alldevs.isEmpty()) {  
             System.err.printf("Can't read list of devices, error is %s", errbuf  
                 .toString());  
             return;  
@@ -135,11 +124,8 @@ public class Speed {
         System.out  
             .printf("\nChoosing '%s' on your behalf:\n",  
                 (device.getDescription() != null) ? device.getDescription()  
-                    : device.getName());  
-  
-        /*************************************************************************** 
-         * Second we open up the selected device 
-         **************************************************************************/  
+                    : device.getName()); 
+        
         int snaplen = 64 * 1024;           // Capture all packets, no trucation  
         int flags = Pcap.MODE_PROMISCUOUS; // capture all packets  
         int timeout = 50 * 1000;           // 10 seconds in millis  
@@ -182,14 +168,8 @@ public class Speed {
         
             
         @Override
-        @SuppressWarnings("empty-statement")
         public void nextPacket(PcapPacket packet, String user)  {
-            //long timestamp = Util.getTimestamp();
-            
-            
-
             if (packet.hasHeader(ip)){
-                
                 byte[] sIP = packet.getHeader(ip).source();
                 String s_IP = org.jnetpcap.packet.format.FormatUtils.ip(sIP);
                 if (!s_IP.equals("10.23.194.252")){
@@ -203,12 +183,13 @@ public class Speed {
                     else
                         udcount++;
                 }
+                else if (packet.hasHeader(new Icmp()))
+                    System.out.print("Kemal");
                 
                 else
                     ucount = ucount + packet.getPacketWirelen();
             }
-            else if (packet.hasHeader(icmp))
-                    System.out.print("kemal");
+            
             
             
             
@@ -225,7 +206,7 @@ public class Speed {
                     udcount = 0;
                     dnscount = 0;
                     time = Util.getTimestamp();
-                    double d = cal(count, t1);
+                    double d = cal(count);
                     sample.setTime(time);
                     sample.setValue("a", d);
                     sample.update();
@@ -283,7 +264,7 @@ public class Speed {
         Thread.sleep(5000);
         s.dispose();
         prepareRRD();
-        Speed speed = new Speed(15, "Current Usage", "Speed", "time");
+        Speed speed = new Speed(15);
           
     }  
         
