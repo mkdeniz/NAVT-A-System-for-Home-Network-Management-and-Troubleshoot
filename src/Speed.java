@@ -264,7 +264,11 @@ public class Speed {
         Thread.sleep(5000);
         s.dispose();
         prepareRRD();
-        Speed speed = new Speed(15);
+        String t = dnsTest.runTest("8.8.8.8");
+        System.out.print(t);
+        t = dnsTest.runTest("google.com");
+        System.out.print(t);
+        //Speed speed = new Speed(15);
           
     }  
         
