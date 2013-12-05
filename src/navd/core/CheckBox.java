@@ -17,7 +17,7 @@ import org.jrobin.graph.RrdGraphDef;
 
 public class CheckBox extends javax.swing.JPanel implements ActionListener {
 
-    private static String name = "/home/mkdeniz/tcp.rdd";
+    private static final String name = "/home/mkdeniz/tcp.rdd";
     private static Boolean tcp,udp = false;
     private JButton btnButton;
     private JCheckBox chkCheckbox,chkCheckbox2;              
