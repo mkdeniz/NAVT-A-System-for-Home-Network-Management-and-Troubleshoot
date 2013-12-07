@@ -18,11 +18,16 @@ import org.jrobin.graph.RrdGraph;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import org.jnetpcap.protocol.tcpip.Udp;
 
 /**
@@ -44,6 +49,14 @@ public class Speed {
     static double cal(int c) {
         return (c/1)/1024;
     }
+    protected JComponent makeTextPanel(String text) {
+        JPanel panel = new JPanel(false);
+        JLabel filler = new JLabel(text);
+        filler.setHorizontalAlignment(JLabel.CENTER);
+        panel.setLayout(new GridLayout(1, 1));
+        panel.add(filler);
+        return panel;
+    }
     
     public static void doGraph() throws RrdException, IOException {
         RrdGraphDef graphDef = new RrdGraphDef();
@@ -62,7 +75,10 @@ public class Speed {
     
     private void prepareFrame() throws RrdException, IOException {
         gDef = new RrdGraphDef();
-        gDef.setTimePeriod(START - 10, START);
+        Date endTime = new Date();
+        Date startTime = new Date(endTime.getTime() - 600000);
+        gDef.setTimePeriod(startTime, endTime);
+        //gDef.setTimePeriod(START - 10, START);
         gDef.setImageBorder(Color.WHITE, 0);
         gDef.setTitle("Bandiwth");
         gDef.setVerticalLabel("Speed");
@@ -84,10 +100,21 @@ public class Speed {
         graphPanel = new GUIGraphPanel(graph);
         frame = new JFrame("Monitor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(graphPanel);
+        //frame.getContentPane().add(graphPanel);
         frame.pack();
+       
+        JTabbedPane tabbedPane = new JTabbedPane();
+        JComponent panel1 = makeTextPanel("Panel #1");
+        tabbedPane.addTab("Tab 1", null,graphPanel,
+                "Does nothing");
+        tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
         
-            
+        JComponent panel2 = makeTextPanel("Panel #2");
+        tabbedPane.addTab("Overview", null, panel2,
+                "Does twice as much nothing");
+        tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+        
+        frame.add(tabbedPane, BorderLayout.CENTER);
         
         frame.addComponentListener(new ComponentAdapter() {
             @Override
@@ -148,6 +175,7 @@ public class Speed {
         jpacketHandler = new PcapPacketHandler<String>() {  
         Tcp tcp = new Tcp();
         Ip4 ip = new Ip4();
+        Udp udp = new Udp();
         Icmp icmp = new Icmp();
         int count = 0;
         double c1 = 0;
@@ -157,7 +185,6 @@ public class Speed {
         long seconds = 0;
         Date t1 = new Date();
         long t = t1.getTime()/1000;
-        long time;
         RrdDb rrdDb = new RrdDb(rrd, RrdBackendFactory.getFactory("MEMORY"));
         RrdDb rrd1 = new RrdDb(name);
         Sample sample = rrdDb.createSample();
@@ -174,46 +201,40 @@ public class Speed {
             if (packet.hasHeader(ip)){
                 byte[] sIP = packet.getHeader(ip).source();
                 String s_IP = org.jnetpcap.packet.format.FormatUtils.ip(sIP);
-                if (!s_IP.equals("10.23.194.252")){
-                    count = count + packet.getPacketWirelen();}
-                if (packet.hasHeader(tcp)){
-                    tcount++;
-                }
-                else if (packet.hasHeader(new Udp())){
-                    if (packet.getHeader(new Udp()).source()== 53 ||packet.getHeader(new Udp()).destination()==53)
+                if (!s_IP.equals("10.23.194.252"))
+                    count = count + packet.getPacketWirelen();
+                else
+                    ucount = ucount + packet.getPacketWirelen();
+                if (packet.hasHeader(tcp)) tcount++;
+                else if (packet.hasHeader(udp)){
+                    if (packet.getHeader(udp).source()== 53 ||packet.getHeader(udp).destination()==53) {
                         dnscount++;
+                        udcount++;
+                    }
                     else
                         udcount++;
                 }
-                else if (packet.hasHeader(new Icmp()))
-                    System.out.print("Kemal");
-                
-                else
-                    ucount = ucount + packet.getPacketWirelen();
+                else if (packet.hasHeader(icmp));
             }
-            
-            
-            
             
             t0 = new Date().getTime()/1000;
             seconds = t0 - t;
             if ( seconds > 1) {
                 try {
                     sample2.setTime(Util.getTimestamp());
-                    sample2.setValue("tcp", tcount); // or: sample.setValue(1, outputValue);
+                    sample2.setValue("tcp", tcount);
                     sample2.setValue("udp", udcount);
                     sample2.setValue("dns", dnscount);
-                    sample2.update();// or: sample.setValue(1, outputValue);
+                    sample2.update();
                     tcount = 0;
                     udcount = 0;
                     dnscount = 0;
-                    time = Util.getTimestamp();
-                    double d = cal(count);
-                    sample.setTime(time);
-                    sample.setValue("a", d);
+                    sample.setTime(Util.getTimestamp());
+                    sample.setValue("a", cal(count));
                     sample.update();
-                    gDef.setTimePeriod(START - 10, time);
-                    end.setTime(time);
+                    Date endTime = new Date();
+                    Date startTime = new Date(endTime.getTime() - 600000);
+                    gDef.setTimePeriod(startTime, endTime);
                     count = 0;
                     ucount = 0;
                     t1 = new Date();
@@ -261,7 +282,7 @@ public class Speed {
      * @throws java.lang.InterruptedException
      */
     public static void main(String[] args) throws IOException, RrdException, InterruptedException {
-        SplashScreen s=new SplashScreen();
+        SplashScreen s = new SplashScreen();
         s.setVisible(true);
         Thread.sleep(5000);
         s.dispose();
@@ -270,7 +291,7 @@ public class Speed {
         System.out.print(t);
         t = dnsTest.runTest("google.com");
         System.out.print(t);
-        //Speed speed = new Speed(15);
+        Speed speed = new Speed(15);
           
     }  
         
