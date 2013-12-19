@@ -1,4 +1,4 @@
-package navd.ui;
+package second;
 
 import javax.swing.*;
 import java.awt.*;
