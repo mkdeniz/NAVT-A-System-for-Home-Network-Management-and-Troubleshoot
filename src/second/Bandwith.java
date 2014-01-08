@@ -6,13 +6,23 @@
 
 package second;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.jrobin.core.RrdException;
+import org.jrobin.core.Util;
+import org.jrobin.graph.RrdGraph;
+import org.jrobin.graph.RrdGraphDef;
 
 /**
  *
@@ -21,57 +31,45 @@ import javax.swing.JPanel;
 public class Bandwith extends JPanel implements ActionListener {
     
     private final String name = "/home/mkdeniz/tcp.rdd";
+    private static final String rrd = "file.rrd";
     private JButton submit;
     private JCheckBox tBox,uBox,dBox,iBox;    
     private Boolean tcp,udp,dns,icmp;  
     private TimeSpinner t1,t2;
+    private static final long START = Util.getTimestamp();
     
-    public Bandwith () {
+    public Bandwith (final JFrame f) throws RrdException {
         super();
-        this.setSize(300, 300);
-        setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        
-        tBox = new JCheckBox("TCP");
-        c.weightx = 0.5;
-        c.gridx = 0;
-        c.gridy = 0;
-        add(tBox,c);
-        
-        uBox = new JCheckBox("UDP");
-        c.weightx = 0.5;
-        c.gridx = 1;
-        c.gridy = 0;
-        add(uBox,c);
-        
-        dBox = new JCheckBox("DNS");
-        c.weightx = 0.5;
-        c.gridx = 0;
-        c.gridy = 1;
-        add(dBox,c);
-        
-        iBox = new JCheckBox("ICMP");
-        c.weightx = 0.5;
-        c.gridx = 1;
-        c.gridy = 1;
-        add(iBox,c);
-        
-        submit = new JButton("Submit");
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridwidth = 2;
-        c.gridx = 0;
-        c.gridy = 2;
-        add(submit, c);
-    
-        t1 = new TimeSpinner();
-        c.gridx = 2;
-        c.gridy = 0;
-        add(t1,c);
-        t2 = new TimeSpinner();
-        c.gridx = 2;
-        c.gridy = 1;
-        add(t2,c);
-        submit.addActionListener(this);
+        RrdGraphDef gDef = new RrdGraphDef();
+        Date endTime = new Date();
+        Date startTime = new Date(endTime.getTime() - 600000);
+        gDef.setTimePeriod(startTime, endTime);
+        //gDef.setTimePeriod(START - 10, START);
+        gDef.setImageBorder(Color.WHITE, 0);
+        gDef.setTitle("Bandiwth");
+        gDef.setVerticalLabel("Speed");
+        gDef.setTimeAxisLabel("Time");
+        gDef.datasource("a", rrd, "a", "AVERAGE", "MEMORY");
+        gDef.datasource( "avg", "a", "AVERAGE");
+        gDef.line("a", Color.decode("0xb6e4"), "Real");
+        gDef.line("avg", Color.RED,  "Average@l");
+        gDef.gprint("a", "MIN", "min = @2 kb/s@l");
+        gDef.gprint("a", "MAX", "max = @2 kb/s@l");
+        gDef.gprint("a", "AVERAGE", "avg = @2 kb/s");
+        gDef.time("@l@lTime period: @t", "MMM dd, yyyy    HH:mm:ss", START);
+        gDef.time("to  @t@c", "HH:mm:ss");
+        RrdGraph graph = new RrdGraph(gDef);
+        final GUIGraphPanel graphPanel = new GUIGraphPanel(graph);
+        this.add(graphPanel);
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension d = f.getContentPane().getSize();
+                graphPanel.setGraphDimension(d);
+            }
+        });
+        this.setSize(f.getContentPane().getSize());
+        f.pack();
     }
 
     @Override

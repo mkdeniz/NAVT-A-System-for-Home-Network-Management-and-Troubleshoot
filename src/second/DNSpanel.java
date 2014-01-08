@@ -115,8 +115,9 @@ public class DNSpanel extends JPanel implements ActionListener  {
             }
             else {
                 l3 = new JLabel("You have no Internet Connection. Contact your ISP");
-                this.f.add(l3);
+                
              }
+            this.f.add(l3);
              l.setVisible(true);
              l1.setVisible(true);
              l2.setVisible(true);

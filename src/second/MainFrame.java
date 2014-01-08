@@ -17,6 +17,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import navd.ui.SplashScreen;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.ChartPanel;
 import org.jrobin.graph.RrdGraph;
@@ -47,7 +48,7 @@ public class MainFrame extends JFrame {
         this.getContentPane().add(jtp); // outer tabbed pane
         jtp.addTab("Control", jpControlTab);
         jtp.addTab("DNS", new DNSpanel());
-        jtp.addTab("Bandwith", new JPanel());
+        jtp.addTab("Bandwith", new Bandwith(this));
         Statistics Stat = new Statistics(this);
         jpControlTab.add(Stat);
         //jpOutTab.add(Stat, BorderLayout.CENTER); 
@@ -65,9 +66,11 @@ public class MainFrame extends JFrame {
     public static void main(String[] args) {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
                 try {
+                    SplashScreen s = new SplashScreen();
+                    s.setVisible(true);
+        Thread.sleep(5000);
+        s.dispose();
                     new MainFrame();
                 } catch (RrdException ex) {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -77,10 +80,9 @@ public class MainFrame extends JFrame {
                     Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-        });
     }
 
     
 
 
-}
+

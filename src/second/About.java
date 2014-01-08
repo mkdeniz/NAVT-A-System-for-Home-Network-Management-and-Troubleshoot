@@ -1,3 +1,5 @@
+package second;
+
 /*
  *  Copyright 2006 Corey Goldberg (cgoldberg _at_ gmail.com)
  *
@@ -31,18 +33,15 @@ public class About extends JDialog implements ActionListener {
         getContentPane().add(panel, BorderLayout.CENTER);
         
         // add logo
+        
         JPanel logoPanel = new JPanel();
         logoPanel.add(new JLabel(new ImageIcon("lib/NetPlot.png")));
         panel.add(logoPanel);
         
         JPanel textPanel = new JPanel();
         String strHelp = "NetPlot - Network Latency Monitor\n\n" +
-            "Copyright 2006 - Corey Goldberg\n\n" +
-            "NetPlot is a network monitoring tool written in Java. " +
-            "It uses your system's ping utility to send ICMP ECHO_REQUEST " +
-            "to a host or device. With each collection, it sends 3 pings to " +
-            "get the average latency. Results are then plotted in real-time " +
-            "so you can monitor network latency." ;
+            "Copyright 2014 - Mehmet Kemal Deniz\n\n" +
+            "University of Glasgow - 4th Year Project" ;
         JTextArea jtaHelpText = new JTextArea(strHelp, 15, 30);
         jtaHelpText.setLineWrap(true);
         jtaHelpText.setWrapStyleWord(true);
@@ -56,8 +55,8 @@ public class About extends JDialog implements ActionListener {
         buttonPanel.add(jbtOK);
         jbtOK.addActionListener(this); 
         
-        setTitle("About NetPlot");
-        setBounds(250, 250, 300, 350);
+        setTitle("About");
+        setBounds(200, 250, 250, 265);
         setVisible(true);    
     }
     

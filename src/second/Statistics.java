@@ -16,10 +16,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import navd.core.Speed;
 import navd.ui.SplashScreen;
@@ -40,9 +42,11 @@ public class Statistics extends JPanel implements ActionListener {
     private TimeSpinner t1,t2;
     //private RrdGraph graph;
     private JFrame frame;
+    JPanel logoPanel = new JPanel();
+    JLabel label = new JLabel(); 
+    private JPanel panel;
     private Dimension d = this.getSize();
     private ChartPanel p;
-    JPanel logoPanel;
     GUIGraphPanel graphPanel;
     
     public GUIGraphPanel get(){
@@ -52,6 +56,7 @@ public class Statistics extends JPanel implements ActionListener {
     public Statistics (JFrame f) throws RrdException, IOException {
         super();
         frame = f;
+        panel = this;
         JPanel j1 = new JPanel();
         JPanel j2 = new JPanel();
         //j1.setLayout(new GridBagLayout());
@@ -143,6 +148,15 @@ public class Statistics extends JPanel implements ActionListener {
             });
             j.setSize(350, 350);
             j.setVisible(true);
+            logoPanel.removeAll();
+            logoPanel.setVisible(false);
+            label.removeAll();
+            label = new JLabel(new ImageIcon("/home/mkdeniz/1.gif"));
+            logoPanel.add(label);
+            panel.add(logoPanel);
+            panel.repaint();
+            logoPanel.repaint();
+            logoPanel.setVisible(true);
         } catch (RrdException | IOException ex) {
             Logger.getLogger(Statistics.class.getName()).log(Level.SEVERE, null, ex);
         }
