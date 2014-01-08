@@ -6,42 +6,23 @@
 
 package second;
 
-import second.GUIGraphPanel;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.AbstractButton;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFormattedTextField;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerModel;
-import javax.swing.text.DateFormatter;
-import javax.swing.text.DefaultFormatterFactory;
-import navd.core.CheckBox;
+import navd.core.Speed;
+import navd.ui.SplashScreen;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.ChartPanel;
 import org.jrobin.graph.RrdGraph;
@@ -55,16 +36,14 @@ public class Statistics extends JPanel implements ActionListener {
     
     private final String name = "/home/mkdeniz/tcp.rdd";
     private JButton submit;
-    private JCheckBox tBox,uBox,dBox,iBox;    
-    private Boolean tcp=false,udp =false, dns = false,icmp = false;  
+    private JCheckBox tBox,uBox,dBox,iBox,hBox;
     private TimeSpinner t1,t2;
-    private RrdGraph graph;
+    //private RrdGraph graph;
     private JFrame frame;
     private Dimension d = this.getSize();
     private ChartPanel p;
     JPanel logoPanel;
     GUIGraphPanel graphPanel;
-    private selectGraph g;
     
     public GUIGraphPanel get(){
         return this.graphPanel;
@@ -101,7 +80,10 @@ public class Statistics extends JPanel implements ActionListener {
         c.gridx = 1;
         c.gridy = 1;*/
         j1.add(iBox);
-    
+        
+        hBox = new JCheckBox("HTTP");
+        j1.add(hBox);
+        
         t1 = new TimeSpinner();/*
         c.gridx = 2;
         c.gridy = 0;*/
@@ -126,12 +108,43 @@ public class Statistics extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e){
         try {
-            g = new selectGraph();
-        } catch (RrdException ex) {
-            Logger.getLogger(Statistics.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+            RrdGraphDef graphDef = new RrdGraphDef();
+            Date endTime = new Date();
+            Date startTime = new Date(endTime.getTime() - 86400 * 10L);
+            graphDef.setTimePeriod(startTime, endTime);
+            if (tBox.isSelected()){
+                graphDef.datasource("tcp", name, "tcp", "AVERAGE");
+                graphDef.area("tcp", new Color(0, 0xFF, 0), "TCP");
+            }
+            if (uBox.isSelected()) {
+                graphDef.datasource("udp", name, "udp", "AVERAGE");
+                graphDef.area("udp", new Color(0, 0, 0xFF), "UDP");
+            }
+            if (dBox.isSelected()) {
+                graphDef.datasource("dns", name, "dns", "AVERAGE");
+                graphDef.area("dns", new Color(0xFF, 0xAA, 0), "DNS");
+            }
+            if (iBox.isSelected()) {
+                graphDef.datasource("icmp", name, "icmp", "AVERAGE");
+                graphDef.area("icmp", new Color(0xFF, 0, 0), "ICMP");
+            }
+            RrdGraph graph = new RrdGraph(graphDef);
+            
+            graph.saveAsGIF("/home/mkdeniz/1.gif");
+            graphPanel = new GUIGraphPanel(graph);
+            final JDialog j = new JDialog();
+            j.add(graphPanel);
+            j.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    Dimension d = j.getContentPane().getSize();
+                    graphPanel.setGraphDimension(d);
+                }
+            });
+            j.setSize(350, 350);
+            j.setVisible(true);
+        } catch (RrdException | IOException ex) {
             Logger.getLogger(Statistics.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
     }
 }

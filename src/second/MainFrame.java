@@ -46,7 +46,7 @@ public class MainFrame extends JFrame {
         
         this.getContentPane().add(jtp); // outer tabbed pane
         jtp.addTab("Control", jpControlTab);
-        jtp.addTab("DNS", new panel());
+        jtp.addTab("DNS", new DNSpanel());
         jtp.addTab("Bandwith", new JPanel());
         Statistics Stat = new Statistics(this);
         jpControlTab.add(Stat);
