@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-package second;
+package main;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import navd.core.dnsTest;
+import Utilities.dnsTest;
 
 /**
  *
@@ -49,7 +49,6 @@ public class DNSpanel extends JPanel implements ActionListener  {
         a.setVisible(false);
         this.setVisible(true);
         w.run();
-            
     }
     
     class MonitorWorker implements Runnable { 
@@ -71,7 +70,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
             l3.setVisible(false);
             int suc = 0;
             String[] t2;
-            t = dnsTest.runTest("8.8.8.8");
+            t = dnsTest.runTest("8.8.8.8","3");
             if (t != null) {
                 t2 = t.split(",");
                 String[] result = t2[1].toString().split("");
@@ -86,7 +85,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 this.f.add(l);
             }
           
-            t = dnsTest.runTest("8.8.8.8");
+            t = dnsTest.runTest("8.8.8.8","3");
             if (t != null) {
                 t2 = t.split(",");
                 String[] result = t2[1].toString().split("");
@@ -102,7 +101,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
             }
             
             if (suc > 0) {
-                t1 = dnsTest.runTest("www.google.com");
+                t1 = dnsTest.runTest("www.google.com","3");
                 if (t1 != null) {
                     t2 = t1.split(",");
                     l2 = new JLabel(t2[2]);

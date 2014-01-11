@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package second;
+package main;
 
 import java.awt.Color;
 import java.awt.Dimension;

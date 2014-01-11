@@ -1,6 +1,6 @@
 package navd.ui;
 
-import second.GUIGraphPanel;
+import main.GUIGraphPanel;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.Date;

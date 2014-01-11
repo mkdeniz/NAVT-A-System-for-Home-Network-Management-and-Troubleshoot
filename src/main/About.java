@@ -1,4 +1,4 @@
-package second;
+package main;
 
 /*
  *  Copyright 2006 Corey Goldberg (cgoldberg _at_ gmail.com)

@@ -1,4 +1,4 @@
-package navd.core;
+package Utilities;
 
 import java.io.*;
 import java.util.*;
@@ -7,12 +7,12 @@ public class dnsTest {
     
     static Process process;
     
-    public static String runTest(String h){
+    public static String runTest(String h, String t){
         try {
             List<String> commands = new ArrayList<>();
             commands.add("/bin/ping");
             commands.add("-c");
-            commands.add("3");
+            commands.add(t);
             commands.add(h);
             ProcessBuilder pb = new ProcessBuilder(commands);
             

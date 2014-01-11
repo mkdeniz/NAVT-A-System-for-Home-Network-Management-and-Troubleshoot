@@ -19,6 +19,7 @@ public class SplashScreen extends JFrame {
     private void prepareRrd() throws IOException, RrdException {
         RrdDef rrdDef = new RrdDef(rrd, 5);
         rrdDef.addDatasource("a", "GAUGE", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("b", "GAUGE", 600, Double.NaN, Double.NaN);
         rrdDef.addArchive("AVERAGE", 0.5, 1, 1000);
         //rrdDef.addDatasource("speed", "COUNTER", 600, Double.NaN, Double.NaN);
         //rrdDef.addArchive("AVERAGE", 0.5, 24, 775);
