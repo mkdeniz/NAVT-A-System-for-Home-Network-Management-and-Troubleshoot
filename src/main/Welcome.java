@@ -43,6 +43,14 @@ public class Welcome extends JDialog implements ActionListener{
     String st;
     private List<PcapIf> alldevs;
     
+    
+    
+    
+    
+    
+    
+    
+    
     public Welcome(){
         super();
         alldevs = new ArrayList<>(); // Will be filled with NICs  

@@ -15,10 +15,13 @@ import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
+import org.jnetpcap.packet.format.FormatUtils;
+import org.jnetpcap.protocol.lan.Ethernet;
 import org.jnetpcap.protocol.network.Arp;
 import org.jnetpcap.protocol.network.Icmp;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Http;
+import org.jnetpcap.protocol.tcpip.Radius;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
 import org.jrobin.core.RrdBackendFactory;
@@ -36,6 +39,7 @@ public class Worker implements Runnable{
     private final String rrd = "file.rrd";
     private final String name = "/home/mkdeniz/tcp.rdd";
     private Arp arp = new Arp();
+    private Ethernet eth = new Ethernet();
     private Tcp tcp = new Tcp();
     private Ip4 ip = new Ip4();
     private Udp udp = new Udp();
@@ -44,6 +48,7 @@ public class Worker implements Runnable{
     private int num;
     private String str;
     private JPanel id;
+    String str2 = "";
     HashMap<String,Integer> hm;
     //Error er = new Error();
     
@@ -59,9 +64,10 @@ public class Worker implements Runnable{
     @Override
     public void run() {
         try {
-            
-            System.out.print(str);
-            System.out.println(str.substring(0, 8));
+            System.out.println(str);
+            String[] host = str.split("\\.");
+            str2 = str2 + host[0] + "." + host[1] + "." + host[2];
+            System.out.println(host.length);
             frame.repaint();
             frame.requestFocus();
             List<PcapIf> alldevs = new ArrayList<>(); // Will be filled with NICs
@@ -123,21 +129,25 @@ public class Worker implements Runnable{
                 
                 @Override
                 public void nextPacket(PcapPacket packet, String user)  {
-                    if (packet.hasHeader(ip)){
+                    
+                    if (packet.hasHeader(ip)/* && tcount == 7*/){
+                        System.out.print(FormatUtils.mac(packet.getHeader(eth).source())+"-");
+                    System.out.println(FormatUtils.mac(packet.getHeader(eth).destination()));
                         byte[] sIP = packet.getHeader(ip).source();
                         String s_IP = org.jnetpcap.packet.format.FormatUtils.ip(sIP);
                         byte[] dIP = packet.getHeader(ip).destination();
                         String d_IP = org.jnetpcap.packet.format.FormatUtils.ip(dIP);
-                        if (!s_IP.equals(str) && !s_IP.startsWith(str.substring(0, 8))){
+                        if (!s_IP.equals(str) && !s_IP.startsWith(str2)){
                             if (hm.containsKey(s_IP)) {
-                                System.out.print("");
-                                System.out.print("YES");
+                                
+                                //System.out.print("");
+                                //System.out.print("YES");
                                 int n = hm.get(s_IP);
                                 n = n + 1;
                                 hm.put(s_IP,n);
                             }
                             else {
-                                System.out.print("NO");
+                                //System.out.print("NO");
                                 hm.put(s_IP, 0);
                             }
                             count = count + packet.getPacketWirelen();
@@ -153,7 +163,11 @@ public class Worker implements Runnable{
                                     udcount++;
                             }
                         }
-                        else if (s_IP.equals(str) && s_IP.startsWith(str.substring(0, 8))){
+                        else if (s_IP.equals(str) || s_IP.startsWith(str.substring(0, 8))){
+                            /*System.out.print(FormatUtils.mac(packet.getHeader(eth).source())+"-");
+                            System.out.println(FormatUtils.mac(packet.getHeader(eth).destination()));*/
+                            System.out.print(FormatUtils.mac(packet.getHeader(eth).source())+"-");
+                            System.out.println(FormatUtils.mac(packet.getHeader(eth).destination()));
                             ucount = ucount + packet.getPacketWirelen();
                             if (packet.hasHeader(tcp)){
                                 if(packet.getHeader(tcp).source()== 80 ||packet.getHeader(tcp).destination()==80) ohcount++;
@@ -168,10 +182,10 @@ public class Worker implements Runnable{
                             }
                         }
                         
-                        System.out.println("============CURRENT REMOTES==============");
+                        /*System.out.println("============CURRENT REMOTES==============");
                         for (String s : hm.keySet())
                             System.out.println(s+":"+hm.get(s));
-                        System.out.println("============END==============");
+                        System.out.println("============END==============");*/
                     }
                    
                     if (icount > 5){

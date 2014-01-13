@@ -14,6 +14,13 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import Utilities.RRD;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
+import javax.swing.border.BevelBorder;
 import navd.ui.SplashScreen;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.Util;
@@ -34,13 +41,14 @@ public class MainFrame extends JFrame {
     protected JPanel jpOutTab1 = new JPanel();
     protected JPanel j1 = new JPanel(new BorderLayout());
     public JFrame f;
+    JLabel clock;
     
     public MainFrame(int n,String s) throws RrdException, IOException, InterruptedException {
         super(s);
         JMenuBar greenMenuBar = new JMenuBar();
         setJMenuBar(greenMenuBar);
         f = this;
-        System.out.print(n);
+        //System.out.print(n);
         RrdGraphDef gDef = new RrdGraphDef();
         Date endTime = new Date();
         Date startTime = new Date(endTime.getTime() - 300000);
@@ -59,10 +67,33 @@ public class MainFrame extends JFrame {
         gDef.time("to  @t@c", "HH:mm:ss");
         RrdGraph graph = new RrdGraph(gDef);
         
+        clock = new JLabel(new Date().toString());
+        JPanel statusPanel = new JPanel();
+statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+this.add(statusPanel, BorderLayout.SOUTH);
+statusPanel.setPreferredSize(new Dimension(this.getWidth(), 16));
+statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+JLabel statusLabel = new JLabel("status");
+statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+statusPanel.add(statusLabel);
+clock.setHorizontalAlignment(SwingConstants.RIGHT);
+statusPanel.add(clock);
         
-        
+    
+
+        ActionListener updateClockAction = new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clock.setText(new Date().toString()); 
+            }
+        };
+
         Menu menu = new Menu("A Menu");
         greenMenuBar.add(menu);
+        
+        Timer t = new Timer(1000, updateClockAction);
+t.start();
         
         RRD.prepareRRD();
         
@@ -71,7 +102,7 @@ public class MainFrame extends JFrame {
             @Override
             public void componentResized(ComponentEvent e) {
                 Dimension d = f.getContentPane().getSize();
-                d.setSize(f.getWidth(), f.getHeight()-70);
+                d.setSize(f.getWidth(), f.getHeight()-70-15);
                 graphPanel.setGraphDimension(d);
             }
         });
@@ -93,9 +124,11 @@ public class MainFrame extends JFrame {
         //graphPanel.setVisible(false);
         //Display the window.00
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.pack();
-        this.setBounds(100, 100, 500, 400);
+        //this.pack();
+        this.setSize(400,300);
         this.setVisible(true);
+        
+        
         setVisible(true);
         
         w.run();
