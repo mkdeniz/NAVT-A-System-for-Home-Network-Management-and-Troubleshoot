@@ -21,8 +21,6 @@ public class SplashScreen extends JFrame {
         rrdDef.addDatasource("a", "GAUGE", 600, Double.NaN, Double.NaN);
         rrdDef.addDatasource("b", "GAUGE", 600, Double.NaN, Double.NaN);
         rrdDef.addArchive("AVERAGE", 0.5, 1, 1000);
-        //rrdDef.addDatasource("speed", "COUNTER", 600, Double.NaN, Double.NaN);
-        //rrdDef.addArchive("AVERAGE", 0.5, 24, 775);
         RrdDb rrdDb = new RrdDb(rrdDef, RrdBackendFactory.getFactory("MEMORY"));
         rrdDb.close();
     }

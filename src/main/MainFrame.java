@@ -58,26 +58,29 @@ public class MainFrame extends JFrame {
         gDef.setVerticalLabel("Speed");
         gDef.setTimeAxisLabel("Time");
         gDef.datasource("a", rrd, "a", "AVERAGE", "MEMORY");
+        gDef.area("a", Color.RED, "Download");
+        gDef.gprint("a", "MAX", "max = @2 kb/s");
+        gDef.gprint("a", "AVERAGE", "avg = @2 kb/s@l");
         gDef.datasource("b", rrd, "b", "AVERAGE", "MEMORY");
-        gDef.line("a", Color.RED, "Real");
-        gDef.line("b", Color.GREEN, "Real");
-        gDef.gprint("a", "MAX", "max = @2 kb/s@l");
-        gDef.gprint("b", "MAX", "max = @2 kb/s@l");
+        gDef.area("b", Color.GREEN, "Upload");
+        gDef.gprint("b", "MAX", "max = @2 kb/s");
+        gDef.gprint("b", "AVERAGE", "avg = @2 kb/s@l");
         gDef.time("@l@lTime period: @t", "MMM dd, yyyy    HH:mm:ss", startTime);
         gDef.time("to  @t@c", "HH:mm:ss");
         RrdGraph graph = new RrdGraph(gDef);
         
         clock = new JLabel(new Date().toString());
         JPanel statusPanel = new JPanel();
-statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
-this.add(statusPanel, BorderLayout.SOUTH);
-statusPanel.setPreferredSize(new Dimension(this.getWidth(), 16));
-statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-JLabel statusLabel = new JLabel("status");
-statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
-statusPanel.add(statusLabel);
-clock.setHorizontalAlignment(SwingConstants.RIGHT);
-statusPanel.add(clock);
+        statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        this.add(statusPanel, BorderLayout.SOUTH);
+        statusPanel.setPreferredSize(new Dimension(this.getWidth(), 16));
+        statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
+        JLabel statusLabel = new JLabel("status");
+        statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        statusPanel.add(statusLabel);
+        statusPanel.add(new JLabel("                              "));
+        clock.setHorizontalAlignment(SwingConstants.RIGHT);
+        statusPanel.add(clock);
         
     
 
@@ -96,6 +99,7 @@ statusPanel.add(clock);
 t.start();
         
         RRD.prepareRRD();
+        RRD.prepareRRD2();
         
         graphPanel = new GUIGraphPanel(graph);
         addComponentListener(new ComponentAdapter() {
@@ -118,7 +122,7 @@ t.start();
         jtp.addTab("Bandwith",null, graphPanel);
         jtp.addTab("Bandwith",IDS);
         jtp.setMnemonicAt(0, KeyEvent.VK_1);
-        Worker w = new Worker(this,gDef,n,s,IDS);
+        Worker w = new Worker(this,gDef,n,s,IDS,statusLabel);
         Statistics Stat = new Statistics(this);
         jpControlTab.add(Stat, BorderLayout.CENTER);
         //graphPanel.setVisible(false);

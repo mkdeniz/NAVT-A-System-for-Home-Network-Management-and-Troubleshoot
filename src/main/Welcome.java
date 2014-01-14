@@ -94,22 +94,25 @@ public class Welcome extends JDialog implements ActionListener{
     public void actionPerformed(ActionEvent e){
         st = field.getText();
         n = petList.getSelectedIndex();
-        this.dispose();
-        Thread thread = new Thread() {
-        @Override
-        public void run() {
-            try {
-                
-                SplashScreen s = new SplashScreen();
-                Thread.sleep(500);
-                s.dispose();
-                MainFrame mainFrame = new MainFrame(n,st);
-            } catch (    RrdException | IOException | InterruptedException ex) {
-                Logger.getLogger(Welcome.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        String[] host = st.split("\\.");
+        if (st.length()>2) {
+            this.dispose();
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+
+                        SplashScreen s = new SplashScreen();
+                        Thread.sleep(500);
+                        s.dispose();
+                        MainFrame mainFrame = new MainFrame(n,st);
+                    } catch (    RrdException | IOException | InterruptedException ex) {
+                        Logger.getLogger(Welcome.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            };
+            thread.start();
         }
-    };
-    thread.start();
     }
     
     public static void main(String[] args) {

@@ -41,4 +41,15 @@ public class RRD {
             rrd.close();
         }
     
+    public static void prepareRRD2() throws RrdException, IOException{
+            RrdDef rrdDef = new RrdDef("/home/mkdeniz/download.rdd", 60);
+            rrdDef.addDatasource("download", "GAUGE", 300, 0, Double.NaN);
+            rrdDef.addDatasource("upload", "GAUGE", 300, 0, Double.NaN);
+            rrdDef.addArchive("AVERAGE", 0.5, 1, 4000);
+            rrdDef.addArchive("AVERAGE", 0.5, 6, 4000);
+            rrdDef.addArchive("AVERAGE", 0.5, 24, 4000);
+            rrdDef.addArchive("AVERAGE", 0.5, 288, 4000);
+            RrdDb rrd = new RrdDb(rrdDef);
+            rrd.close();
+        }
 }

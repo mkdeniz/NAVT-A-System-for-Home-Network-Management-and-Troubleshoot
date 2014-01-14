@@ -12,6 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import Utilities.dnsTest;
+import java.awt.GridLayout;
+import javax.swing.ImageIcon;
+import javax.swing.border.TitledBorder;
 
 /**
  *
@@ -25,10 +28,11 @@ public class DNSpanel extends JPanel implements ActionListener  {
     private MonitorWorker w;
     private JButton submit;
     JLabel a;
-    
+    JPanel j1;
     public DNSpanel() throws InterruptedException {
         super();
-        submit = new JButton("Submit");
+        j1 =  new JPanel(new GridLayout(4,1));
+        submit = new JButton("Retest");
         add(submit);
         a = new JLabel("Getting test");
         add(a);
@@ -38,7 +42,6 @@ public class DNSpanel extends JPanel implements ActionListener  {
         w.run();
         this.a.setVisible(false);
         submit.addActionListener(this);
-        
     }
     
     @Override
@@ -64,6 +67,8 @@ public class DNSpanel extends JPanel implements ActionListener  {
 
         @Override
         public void run() {
+            
+            j1.setBorder(new TitledBorder("Results"));
             l.setVisible(false);
             l1.setVisible(false);
             l2.setVisible(false);
@@ -76,13 +81,19 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 String[] result = t2[1].toString().split("");
                 String[] time = t2[t2.length-1].toString().split(" ");
                 int recv = Integer.parseInt(result[2]);
-                if (recv == 0)
+                if (recv == 0){
+                    ImageIcon img1= new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
                     l = new JLabel("\nGoogle DNS Test: " + t2[2] + " in " + time[2]);
-                else {
-                    l = new JLabel("\nGoogle DNS Test: " + recv + " Received, " + t2[2] + " in " + time[2]);
-                    suc++;
+                    l.setIcon(img1);
                 }
-                this.f.add(l);
+                else {
+                    ImageIcon img1 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
+                    l = new JLabel("\nGoogle DNS Test: " + recv + " Received, " + t2[2] + " in " + time[2]);
+                    l.setIcon(img1);
+                    suc++;
+                    
+                }
+                j1.add(l);
             }
           
             t = dnsTest.runTest("8.8.8.8","3");
@@ -91,13 +102,19 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 String[] result = t2[1].toString().split("");
                 String[] time = t2[t2.length-1].toString().split(" ");
                 int recv = Integer.parseInt(result[2]);
-                if (recv == 0)
+                if (recv == 0){
+                    ImageIcon img= new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
                     l1 = new JLabel("\nOpenDNS Test: " + t2[2] + " in " + time[2]);
+                    l1.setIcon(img);
+                }
                 else {
+                    ImageIcon img= new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
                     l1 = new JLabel("\nOpenDNS Test: " + recv + " Received, " + t2[2] + " in " + time[2]);
+                    l1.setIcon(img);
                     suc++;
                 }
-                this.f.add(l1);
+                j1.add(l1);
+                
             }
             
             if (suc > 0) {
@@ -105,22 +122,34 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 if (t1 != null) {
                     t2 = t1.split(",");
                     l2 = new JLabel(t2[2]);
-                    this.f.add(new JLabel(t1));
+                    ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
+                    JLabel j = new JLabel(t1);
+                    j.setIcon(img3);
+                    j1.add(j);
+                    l3 = new JLabel("Your Internet Connection and DNS seems fine.");
+                    l3.setIcon(img3);
                 }
             
-                else 
-                    this.f.add(new JLabel("KEMAL"));
-                l3 = new JLabel("You have Internet Connection.");
+                else {
+                    ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
+                    
+                    l3 = new JLabel("Your DNS Settings are wrong Connection.");
+                    l3.setIcon(img3);
+                }
             }
             else {
+                ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
+                    
                 l3 = new JLabel("You have no Internet Connection. Contact your ISP");
+                l3.setIcon(img3);
                 
              }
-            this.f.add(l3);
+             j1.add(l3);
              l.setVisible(true);
              l1.setVisible(true);
              l2.setVisible(true);
              l3.setVisible(true);
+             this.f.add(j1);
        }
     }  
     
