@@ -28,10 +28,10 @@ public class DNSpanel extends JPanel implements ActionListener  {
     private MonitorWorker w;
     private JButton submit;
     JLabel a;
-    JPanel j1;
+    
     public DNSpanel() throws InterruptedException {
         super();
-        j1 =  new JPanel(new GridLayout(4,1));
+        
         submit = new JButton("Retest");
         add(submit);
         a = new JLabel("Getting test");
@@ -56,6 +56,8 @@ public class DNSpanel extends JPanel implements ActionListener  {
     
     class MonitorWorker implements Runnable { 
         private JPanel f;
+        JPanel j1 =  new JPanel(new GridLayout(4,1));
+        
         JLabel l = new JLabel();
         JLabel l1 = new JLabel();
         JLabel l2 = new JLabel();
@@ -68,8 +70,9 @@ public class DNSpanel extends JPanel implements ActionListener  {
         @Override
         public void run() {
             
-            j1.setBorder(new TitledBorder("Results"));
+            
             l.setVisible(false);
+            j1.setVisible(false);
             l1.setVisible(false);
             l2.setVisible(false);
             l3.setVisible(false);
@@ -145,6 +148,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 
              }
              j1.add(l3);
+             j1.setVisible(true);
              l.setVisible(true);
              l1.setVisible(true);
              l2.setVisible(true);

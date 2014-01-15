@@ -11,20 +11,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.packet.PcapPacketHandler;
-import org.jnetpcap.packet.format.FormatUtils;
 import org.jnetpcap.protocol.lan.Ethernet;
 import org.jnetpcap.protocol.network.Arp;
 import org.jnetpcap.protocol.network.Icmp;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.tcpip.Http;
-import org.jnetpcap.protocol.tcpip.Radius;
 import org.jnetpcap.protocol.tcpip.Tcp;
 import org.jnetpcap.protocol.tcpip.Udp;
 import org.jrobin.core.RrdBackendFactory;
@@ -62,22 +59,24 @@ public class Worker implements Runnable{
     Sample sample2;
     Sample sample3;
     long tmp = 0;
-            long tmp2 = 0;
-    int hcount = 0;   //IN HTTP
-                int ohcount = 0;  //OUT HTTP
-                long ucount = 0;   //UPLOAD
-                long count = 0;    //DOWNLOAD
-                int tcount = 0;   //IN TCP
-                int otcount = 0;  //OUT TCP
-                int icount = 0;   //IN ICMP
-                int oicount = 0;  //OUT ICMP
-                int udcount = 0;  //IN UDP
-                int oudcount = 0; //OUT UDP
-                int dnscount = 0; //IN DNS
-                int odnscount = 0;//OUT DNS
-                int counter = 0;
-                long totald = 0;
-                long totalu= 0;
+    long tmp2 = 0;
+    int hcount = 0;    //IN HTTP
+    int ohcount = 0;   //OUT HTTP
+    long ucount = 0;   //UPLOAD
+    long count = 0;    //DOWNLOAD
+    int tcount = 0;    //IN TCP
+    int otcount = 0;   //OUT TCP
+    int icount = 0;    //IN ICMP
+    int oicount = 0;   //OUT ICMP
+    int udcount = 0;   //IN UDP
+    int oudcount = 0;  //OUT UDP
+    int dnscount = 0;  //IN DNS
+    int odnscount = 0; //OUT DNS
+    int counter = 0;
+    long totald = 0;
+    long totalu= 0;
+    int syn = 0;
+    int ack = 0;
     
     public Worker(JFrame f, RrdGraphDef g,int n,String s,JPanel ids,JLabel l) throws IOException, RrdException{
         frame = f;
@@ -87,7 +86,7 @@ public class Worker implements Runnable{
         num = n;
         str = s;
         label = l;
-        hm =new HashMap<String,Integer>();
+        hm = new HashMap<String,Integer>();
         Timer t = new Timer(1000, updateRRD);
         t.start();
         rrdDb = new RrdDb(rrd, RrdBackendFactory.getFactory("MEMORY"));
@@ -145,7 +144,13 @@ public class Worker implements Runnable{
                     totalu = totalu + ucount;
                     sample3.setValue("upload", totalu);
                     sample3.update();
+                    ack = 0;
                     ucount = 0;
+                    for (String str : hm.keySet())
+                        if (hm.get(str) > 20) id.add(new JLabel("Too Many Activity to host" + " " + str +" "+ new Date().toString())); 
+                    hm.clear();
+                    if (syn > 10) id.add(new JLabel("Too Many syn" + "Possible SYN FLOOD " + new Date().toString())); 
+                    syn = 0;
                     Thread.sleep(500);
                 } catch (RrdException | IOException | InterruptedException ex) {
                     Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
@@ -189,25 +194,38 @@ public class Worker implements Runnable{
         }
         PcapPacketHandler<String> jpacketHandler;
         jpacketHandler = new PcapPacketHandler<String>() {
-            double c1 = 0;
-            double c = 0;
-            double diff = 0;
-            long t0 = 0;
-            JLabel j = new JLabel();
-            long seconds = 0;
-            long t = new Date().getTime()/1000;
-            int syn = 0;
-            int ack = 0;
-            int synack = 0;
-            
             @Override
             public void nextPacket(PcapPacket packet, String user)  {
-                System.out.println("########### "+syn+" = "+ack+" #######");
+                
                 if (packet.hasHeader(ip)/* && tcount == 7*/){
                     byte[] sIP = packet.getHeader(ip).source();
                     String s_IP = org.jnetpcap.packet.format.FormatUtils.ip(sIP);
                     byte[] dIP = packet.getHeader(ip).destination();
                     String d_IP = org.jnetpcap.packet.format.FormatUtils.ip(dIP);
+                    if (packet.hasHeader(udp)){
+                        if (packet.getHeader(udp).destination() == 68 ||packet.getHeader(udp).source() == 68   || packet.getHeader(udp).destination() == 67 || packet.getHeader(udp).source() == 67) {
+                        int n = (packet.toHexdump().indexOf("0110:"));
+                        String type_dhcp = packet.toHexdump().substring(n+46, n+45+2);
+                            switch (type_dhcp) {
+                                case "1":
+                                    id.add(new JLabel("DHCP Discovery - "+s_IP+" : "+d_IP));
+                                    break;
+                                case "2":
+                                    id.add(new JLabel("DHCP Offer - "+s_IP+" : "+d_IP));
+                                    break;
+                                case "3":
+                                    id.add(new JLabel("DHCP Request - "+s_IP+" : "+d_IP));
+                                    break;
+                                case "5":
+                                    id.add(new JLabel("DHCP Ack - "+s_IP+" : "+d_IP));
+                                    break;
+                                case "7":
+                                    id.add(new JLabel("DHCP Release - "+s_IP+" : "+d_IP));
+                                    break;
+                            }
+                        }
+                    }
+                    
                     if (!s_IP.equals(str) && !s_IP.startsWith(str2)){
                         if (hm.containsKey(s_IP)) {
                             int n = hm.get(s_IP);
@@ -251,40 +269,13 @@ public class Worker implements Runnable{
                         else if (packet.hasHeader(udp)){
                             if (packet.getHeader(udp).source()== 53 ||packet.getHeader(udp).destination()==53) {
                                 odnscount++;
-                                //System.out.print("NO");
                             }
                             else
                                 oudcount++;
                         }
                     }
-                    
-                    /*System.out.println("============CURRENT REMOTES==============");
-                    for (String s : hm.keySet())
-                    System.out.println(s+":"+hm.get(s));
-                    System.out.println("============END==============");*/
                 }
-                
-                /*if (icount > 5){
-                    id.add(new JLabel("ICMP Attack"));
-                    
-                }
-                test.setText(""+totald);
-                t0 = new Date().getTime()/1000;
-                seconds = t0 - t;
-                if ( seconds > 2) {
-                    if (counter == 3600) hm.clear();
-                    counter++;
-                    try {
-                        
-                        t = new Date().getTime()/1000;
-                    } catch (RrdException | IOException ex) {
-                        Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-                }
-                
-            }*/}
-            
+            }
         };
         pcap.loop(0, jpacketHandler, "jNetPcap rocks!");
         pcap.close();

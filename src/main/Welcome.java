@@ -82,11 +82,6 @@ public class Welcome extends JDialog implements ActionListener{
         this.setVisible(true);
         this.setSize(250, 100);
         button.addActionListener(this);
-        
-        
-        
-       
-        
      
     }
     

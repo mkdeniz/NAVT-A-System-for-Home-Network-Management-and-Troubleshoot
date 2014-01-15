@@ -42,6 +42,7 @@ public class Statistics extends JPanel implements ActionListener {
     public Statistics (JFrame f) throws RrdException, IOException {
         super(new GridLayout(1,2));
         JPanel j1 =  new JPanel(new GridLayout(2,3));
+        j1.setSize(f.getWidth()/2, 100);
         JPanel j2 = new JPanel();
         j1.setBorder(new TitledBorder("Options"));
         
