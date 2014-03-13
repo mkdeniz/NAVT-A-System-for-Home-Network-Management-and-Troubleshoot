@@ -4,17 +4,16 @@
  * and open the template in the editor.
  */
 
-package main;
+package uk.ac.gla.navt.ui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import Utilities.dnsTest;
+import uk.ac.gla.navt.utilities.dnsTest;
 import java.awt.GridLayout;
 import javax.swing.ImageIcon;
-import javax.swing.border.TitledBorder;
 
 /**
  *

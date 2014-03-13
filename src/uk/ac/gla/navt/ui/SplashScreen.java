@@ -1,4 +1,4 @@
-package navd.ui;
+package uk.ac.gla.navt.ui;
 
 import javax.swing.*;
 import java.awt.*;

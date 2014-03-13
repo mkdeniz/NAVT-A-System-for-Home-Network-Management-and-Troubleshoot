@@ -4,12 +4,11 @@
  * and open the template in the editor.
  */
 
-package main;
+package uk.ac.gla.navt.main;
 
+import uk.ac.gla.navt.ui.GUIGraphPanel;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -34,8 +33,7 @@ public class Bandwith extends JPanel implements ActionListener {
     private static final String rrd = "file.rrd";
     private JButton submit;
     private JCheckBox tBox,uBox,dBox,iBox;    
-    private Boolean tcp,udp,dns,icmp;  
-    private TimeSpinner t1,t2;
+    private Boolean tcp,udp,dns,icmp;
     private static final long START = Util.getTimestamp();
     
     public Bandwith (final JFrame f) throws RrdException {

@@ -1,5 +1,5 @@
 
-package main;
+package uk.ac.gla.navt.ui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,7 +32,6 @@ public class Statistics extends JPanel implements ActionListener {
     protected String name = "/home/mkdeniz/tcp.rdd";
     protected JButton submit;
     protected JCheckBox tBox,uBox,dBox,iBox,hBox;
-    protected TimeSpinner t1,t2;
     protected JFrame frame;
     protected JPanel panel;
     protected Dimension d = this.getSize();

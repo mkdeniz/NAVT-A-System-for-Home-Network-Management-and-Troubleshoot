@@ -1,3 +1,5 @@
+package uk.ac.gla.navt.ui;
+
 import java.awt.Color;
 import java.awt.Container;
 

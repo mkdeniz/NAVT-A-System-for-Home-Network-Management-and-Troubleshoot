@@ -1,4 +1,4 @@
-package main;
+package uk.ac.gla.navt.ui;
 
 /*
  *  Copyright 2006 Corey Goldberg (cgoldberg _at_ gmail.com)

@@ -1,4 +1,4 @@
-package Utilities;
+package uk.ac.gla.navt.utilities;
 
 import java.io.*;
 import java.util.*;

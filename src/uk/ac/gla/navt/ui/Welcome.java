@@ -1,10 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package main;
+package uk.ac.gla.navt.ui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -18,15 +12,10 @@ import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import navd.ui.SplashScreen;
+import uk.ac.gla.navt.ui.SplashScreen;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 
 /**
@@ -42,13 +31,6 @@ public class Welcome extends JDialog implements ActionListener{
     int n;
     String st;
     private List<PcapIf> alldevs;
-    
-    
-    
-    
-    
-    
-    
     
     
     public Welcome(){
@@ -70,7 +52,6 @@ public class Welcome extends JDialog implements ActionListener{
                 (device.getDescription() != null) ? device.getDescription()  
                     : "No description available";  
             petStrings.add(device.getName());
-            //System.out.printf("#%d: %s [%s]\n", i++, device.getName(), description); 
         }  
         
         petList = new JComboBox((Vector) petStrings);
@@ -96,12 +77,8 @@ public class Welcome extends JDialog implements ActionListener{
                 @Override
                 public void run() {
                     try {
-
-                        SplashScreen s = new SplashScreen();
-                        Thread.sleep(500);
-                        s.dispose();
                         MainFrame mainFrame = new MainFrame(n,st);
-                    } catch (    RrdException | IOException | InterruptedException ex) {
+                    } catch (RrdException | IOException | InterruptedException ex) {
                         Logger.getLogger(Welcome.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -111,6 +88,7 @@ public class Welcome extends JDialog implements ActionListener{
     }
     
     public static void main(String[] args) {
+        
         new Welcome();
     }
                 
