@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package uk.ac.gla.navt.main;
+package uk.ac.gla.navt.ui;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;

@@ -1,10 +1,9 @@
 package uk.ac.gla.navt.ui;
 
 import uk.ac.gla.navt.utilities.Database;
-import uk.ac.gla.navt.ui.Menu;
-import uk.ac.gla.navt.ui.GUIGraphPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
@@ -18,12 +17,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
+import javax.swing.table.DefaultTableModel;
 import uk.ac.gla.navt.main.Worker;
-import uk.ac.gla.navt.ui.DNSpanel;
-import uk.ac.gla.navt.ui.Traceroute;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
@@ -37,11 +37,11 @@ public class MainFrame extends JFrame {
     protected JTabbedPane jtp  = new JTabbedPane();
     protected GUIGraphPanel graphPanel;
     protected String rrd = "file.rrd";
-    protected JPanel jpControlTab = new JPanel(new BorderLayout());
     protected JPanel jpOutTab = new JPanel();
     protected JFrame frame;
     protected JLabel clock;
     protected JLabel statusLabel;
+    private final DNSpanel dPanel;
     
     private void prepareStatus() {
         clock = new JLabel(new Date().toString());
@@ -90,23 +90,41 @@ public class MainFrame extends JFrame {
             }
         });
         
-        JPanel IDS = new JPanel();
+        JPanel IDS = new JPanel(new GridLayout(1,0));
+        JTable table = new JTable();
+        JScrollPane pane = new JScrollPane(table);
+        pane.setSize(200, 350 );
+        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"column1","column2"},0);
+        
+        table.setModel(tableModel);
+        IDS.add(pane);
+        pane.setSize(350,450);
+        IDS.setSize(350,450);
+        table.setSize(350,450);
+        
         
         //Creating Tabs
+        JPanel jpControlTab = new JPanel(new BorderLayout());
+        dPanel = new DNSpanel();
+        String Result = "" + dPanel.getResults();
+        jpControlTab.add((new JLabel( Result)));
         this.getContentPane().add(jtp); // outer tabbed pane
         jtp.addTab("Control", jpControlTab);
-        jtp.addTab("DNS", new DNSpanel());
+        jtp.addTab("DNS", dPanel);
         jtp.addTab("Bandwith", graphPanel);
         jtp.addTab("Notification",IDS);
-        jtp.addTab("Traceroute", new Traceroute());
+        jtp.addTab("Traceroute", new ForkDemo());
         jtp.setMnemonicAt(0, KeyEvent.VK_1);
-        jpControlTab.add(new Statistics(this), BorderLayout.CENTER);
+        Thread.sleep(1000);
+        jpControlTab.add(new Statistics(this,Result), BorderLayout.CENTER);
         
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(450,350);
+        
+        this.setLocationByPlatform(true);
         this.setVisible(true);
         
-        Worker w = new Worker(this,gDef,n,s,IDS,statusLabel);
+        Worker w = new Worker(this,gDef,n,s,tableModel,statusLabel);
         w.run();
     }
 }

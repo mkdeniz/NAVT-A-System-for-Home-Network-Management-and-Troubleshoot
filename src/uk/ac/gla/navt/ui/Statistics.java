@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import org.jrobin.core.RrdException;
@@ -28,44 +30,47 @@ import org.jrobin.graph.RrdGraphDef;
  * @author root
  */
 public class Statistics extends JPanel implements ActionListener {
-    
+   
+    protected JLabel Overall;
     protected String name = "/home/mkdeniz/tcp.rdd";
     protected JButton submit;
     protected JCheckBox tBox,uBox,dBox,iBox,hBox;
-    protected JFrame frame;
-    protected JPanel panel;
-    protected Dimension d = this.getSize();
-    private ChartPanel p;
     protected GUIGraphPanel graphPanel;
     
-    public Statistics (JFrame f) throws RrdException, IOException {
-        super(new GridLayout(1,2));
-        JPanel j1 =  new JPanel(new GridLayout(2,3));
+    public Statistics (JFrame f,String result) throws RrdException, IOException {
+        super(new GridLayout(1,1));
+        JPanel j1 =  new JPanel(new GridLayout(3,3));
         j1.setSize(f.getWidth()/2, 100);
-        JPanel j2 = new JPanel();
-        j1.setBorder(new TitledBorder("Options"));
+        j1.setBorder(new TitledBorder("Overview"));
         
-        tBox = new JCheckBox("TCP");
-        j1.add(tBox);
+        JLabel DNS;
+        if (Integer.parseInt(result) > 0){
+            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
+            DNS = new JLabel("DNS");
+            DNS.setIcon(img3);
+        }
+        else {
+            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
+            DNS = new JLabel("DNS");
+            DNS.setIcon(img3);
+        }
         
-        uBox = new JCheckBox("UDP");
-        j1.add(uBox);
+        JLabel Overall;
+        if (Integer.parseInt(result) > 0){
+            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
+            Overall = new JLabel("No Problems Detected");
+            Overall.setIcon(img3);
+        }
+        else {
+            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
+            Overall = new JLabel("Problem Detected");
+            Overall.setIcon(img3);
+        }
         
-        dBox = new JCheckBox("DNS");
-        j1.add(dBox);
-        
-        iBox = new JCheckBox("ICMP");
-        j1.add(iBox);
-        
-        hBox = new JCheckBox("HTTP");
-        j1.add(hBox);
-        
-        submit = new JButton("Submit");
-        j2.add(submit);
+        j1.add(DNS);
+        j1.add(Overall);
         
         add(j1);
-        add(j2);
-        submit.addActionListener(this);
         this.setSize(300, 300);
     }
     
@@ -124,3 +129,4 @@ public class Statistics extends JPanel implements ActionListener {
         }
     }
 }
+
