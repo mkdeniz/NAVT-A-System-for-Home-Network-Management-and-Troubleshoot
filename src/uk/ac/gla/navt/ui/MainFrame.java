@@ -71,12 +71,15 @@ public class MainFrame extends JFrame {
         frame = this;
         JMenuBar greenMenuBar = new JMenuBar();
         setJMenuBar(greenMenuBar);
-        Menu menu = new Menu("A Menu");
+        Menu menu = new Menu("Menu");
         greenMenuBar.add(menu);
         prepareStatus();
         
+        System.out.print("System is preparing databases:");
         Database d = new Database(rrd);
-        d.prepareRrd();
+        d.prepareRRDB();
+        d.prepareRRDC();
+        
         RrdGraphDef gDef = d.prepareBandwith();
         RrdGraph graph = new RrdGraph(gDef);
         
@@ -89,43 +92,49 @@ public class MainFrame extends JFrame {
                 graphPanel.setGraphDimension(d);
             }
         });
+        System.out.println(" Done");
         
-        JPanel IDS = new JPanel(new GridLayout(1,0));
+        System.out.print("System is preparing panels:");
+        JPanel Events = new JPanel(new GridLayout(1,0));
         JTable table = new JTable();
         JScrollPane pane = new JScrollPane(table);
         pane.setSize(200, 350 );
-        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"column1","column2"},0);
+        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Event","Source"},0);
         
         table.setModel(tableModel);
-        IDS.add(pane);
+        Events.add(pane);
         pane.setSize(350,450);
-        IDS.setSize(350,450);
+        Events.setSize(350,450);
         table.setSize(350,450);
-        
         
         //Creating Tabs
         JPanel jpControlTab = new JPanel(new BorderLayout());
+        Classification c = new Classification(this);
         dPanel = new DNSpanel();
         String Result = "" + dPanel.getResults();
         jpControlTab.add((new JLabel( Result)));
         this.getContentPane().add(jtp); // outer tabbed pane
-        jtp.addTab("Control", jpControlTab);
+        jtp.addTab("Overview", jpControlTab);
         jtp.addTab("DNS", dPanel);
         jtp.addTab("Bandwith", graphPanel);
-        jtp.addTab("Notification",IDS);
-        jtp.addTab("Traceroute", new ForkDemo());
+        jtp.addTab("Events", Events);
+        jtp.addTab("Classification", c);
         jtp.setMnemonicAt(0, KeyEvent.VK_1);
         Thread.sleep(1000);
         jpControlTab.add(new Statistics(this,Result), BorderLayout.CENTER);
-        
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(450,350);
-        
         this.setLocationByPlatform(true);
         this.setVisible(true);
+        System.out.println(" Done");
         
+        System.out.print("System is preparing analyser:");
         Worker w = new Worker(this,gDef,n,s,tableModel,statusLabel);
+        System.out.println(" Done");
+        
         w.run();
+        
+        
     }
 }
 

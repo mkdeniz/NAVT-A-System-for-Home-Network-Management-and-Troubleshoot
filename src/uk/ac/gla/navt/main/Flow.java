@@ -100,13 +100,7 @@ public class Flow {
             double v = arr2.get(i);
             sum = sum + v;
         }
-        return (sum/(l-3));
-            
-    }
-    
-    public double getDur(){
-        double intv = this.end.getTime() - this.start.getTime();
-        return intv*0.001;
+        return (sum/(l-3));       
     }
     
     @Override
@@ -125,36 +119,16 @@ public class Flow {
             double intV = tmp.getTime() - this.end.getTime();
             this.end = tmp;
             arr.add(intV);
-            double a = b;
-            arr2.add(a);
+            arr2.add((double)b);
             this.traffic = this.traffic + b;
         }
-    } 
-    
-    public void in(){
-        in++;
-    }
-    public void out() {
-        out++;
     }
     
     public String End() {
-        
         this.end = new Date();
         this.open = false;
         double t = this.traffic/1024;
         String s = "";
-        //if ((this.in > 0 && this.out > 0) || this.out > 5 || this.in > 5) {
-        s = s + "Flow: " + this.s_ip + ":" + this.s_port + " - " + this.d_ip + ":" + this.d_port +// + " - " + this.start +  " - " + this.end + "\n" +
-                "\nInterarrival Time: "+this.min_int+" : "+ this.meanTime()*0.001 +" : "+ this.varTime() +
-                "\nPackets: " + this.in + " : " + this.out + " : " + this.meanPacket()/1024 + " : " + this.varPacket() +
-                "\nTotal Duration and Traffic: " + this.traffic/this.getDur() + " : " + t + " : " + this.traffic/1024 +
-                "";//"\n"+this.s_port+","+this.d_port+","+this.avg()+","+this.varArr();
         return "" + this.s_port+"," + this.d_port + "," + this.meanTime()*0.001 +","+ this.varTime() +","+ this.meanPacket()/1024 + "," + this.varPacket() + "\n";}
-        //else
-          //  return "";
-    
-    
-    
-            
+         
 }

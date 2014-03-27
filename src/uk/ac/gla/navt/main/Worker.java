@@ -5,8 +5,8 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
@@ -54,12 +54,12 @@ public class Worker implements Runnable{
     protected Tcp tcp;
     protected Udp udp;
     protected DefaultTableModel tableModel;
-    protected static HashMap<String,Flow> flows;
-    protected static HashMap<String,UFlow> uflows;
+    protected static ConcurrentHashMap<String,Flow> flows;
+    protected static ConcurrentHashMap<String,UFlow> uflows;
     
     public Worker(JFrame f, RrdGraphDef g, int n, String s,DefaultTableModel model, JLabel l) throws IOException, RrdException{
-        flows = new HashMap<>();
-        uflows = new HashMap<>();
+        flows = new ConcurrentHashMap<>();
+        uflows = new ConcurrentHashMap<>();
         ip = new Ip4();
         tcp = new Tcp();
         udp = new Udp();
@@ -69,15 +69,36 @@ public class Worker implements Runnable{
         num = n;
         str = s;
         label = l;
-        Timer t = new Timer(1000, updateRRD);
+        Timer t = new Timer(1100, updateRRD);
+        Timer t2 = new Timer(10000, removeUDP);
+        Timer t3 = new Timer(3600000, refresh);
         t.start();
+        t2.start();
         rrdDb = new RrdDb(rrd, RrdBackendFactory.getFactory("MEMORY"));
-        rrd1 = new RrdDb(name);
-        rrd2 = new RrdDb("/home/mkdeniz/download.rdd");
         sample = rrdDb.createSample();
-        sample2 = rrd1.createSample();
-        sample3 = rrd2.createSample();
     }
+    
+    ActionListener removeUDP = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for(String str : uflows.keySet()){
+                    if (!uflows.get(str).open)
+                        uflows.remove(str);
+                }  
+                for(String str : flows.keySet()){
+                    if (!flows.get(str).open)
+                        flows.remove(str);
+                }  
+            }
+        };
+    
+    ActionListener refresh = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                uflows.clear();
+                flows.clear();
+            }
+        };
     
     ActionListener updateRRD = new ActionListener() {
             @Override
@@ -90,12 +111,13 @@ public class Worker implements Runnable{
                     sample.setValue("b", tmp2);
                     label.setText("D/L:"+tmp+" U/L"+tmp2);
                     sample.update();
-                    frame.repaint();
                     Date endTime = new Date();
                     Date startTime = new Date(endTime.getTime() - 300000);
                     gDef.setTimePeriod(startTime, endTime);
+                    frame.repaint();
                     count = 0;
                     ucount = 0;
+                    
                 } catch (IOException | RrdException ex) {
                     Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -104,10 +126,8 @@ public class Worker implements Runnable{
 
     @Override
     public void run() {
-        System.out.println(str);
         String[] host = str.split("\\.");
         str2 = str2 + host[0] + "." + host[1] + "." + host[2];
-        System.out.println(host.length);
         frame.repaint();
         frame.requestFocus();
         List<PcapIf> alldevs = new ArrayList<>();
@@ -116,13 +136,6 @@ public class Worker implements Runnable{
         if (alldevs.isEmpty()) {
             System.err.printf("Can't read list of devices, error is %s", errbuf.toString());
             return;
-        }
-        int i = 0;
-        for (PcapIf device : alldevs) {
-            String description =
-                    (device.getDescription() != null) ? device.getDescription()
-                    : "No description available";
-            System.out.printf("#%d: %s [%s]\n", i++, device.getName(), description);
         }
         PcapIf device = alldevs.get(num);
         System.out.printf("\nChoosing '%s' on your behalf:\n",
@@ -175,28 +188,18 @@ public class Worker implements Runnable{
                             if (uflows.containsKey(f.check())){
                                 f.destroy();
                                 temp = (UFlow) uflows.get(f.check());
-                                if (!s_IP.equals("10.23.194.252")) 
-                                    temp.in();
-                                else 
-                                    temp.out();
                                 temp.updateByte(packet.getPacketWirelen());
                                 uflows.put(f.check(), temp);
                             }
                             else if (uflows.containsKey(f.check2())){
                                 f.destroy();
                                 temp = (UFlow) uflows.get(f.check2());
-                                    if (!s_IP.equals("10.23.194.252"))
-                                        temp.in();
-                                    else 
-                                        temp.out();
                                     temp.updateByte(packet.getPacketWirelen());
                                     uflows.put(f.check2(), temp);
                             }
                             else {
                                 f.updateByte(packet.getTotalSize());
                                 uflows.put(f.check(), f);
-                                if (!s_IP.equals("10.23.194.252")) f.in();
-                                else f.out();
                             }
                         }
                         else if (packet.hasHeader(tcp)) {
@@ -205,14 +208,10 @@ public class Worker implements Runnable{
                             if (flows.containsKey(f.check())){
                                 temp = flows.get(f.check());
                                 if (packet.getHeader(tcp).flags_FIN() && s_IP.equals(str)) {
-                                    System.out.println(temp.End());
-                                    System.out.println(flows.remove(f.check()));
+                                   temp.End();
+                                   flows.remove(f.check());
                                 }
                                 else{
-                                    if (!s_IP.equals("10.23.194.252")) 
-                                        temp.in();
-                                    else 
-                                        temp.out();
                                     temp.updateByte(packet.getPacketWirelen());
                                     flows.put(f.check(), temp);
                                 }
@@ -220,14 +219,10 @@ public class Worker implements Runnable{
                             else if (flows.containsKey(f.check2())){
                                 temp = flows.get(f.check2());
                                 if (packet.getHeader(tcp).flags_FIN() && !s_IP.equals(str)) {
-                                    System.out.println(temp.End());
-                                    //System.out.println(flows.remove(f.check()));
+                                    temp.End();
+                                    flows.remove(f.check());
                                 }
                                 else{
-                                    if (!s_IP.equals("10.23.194.252")){
-                                        temp.in();
-                                    }
-                                    else temp.out();
                                     temp.updateByte(packet.getPacketWirelen());
                                     flows.put(f.check2(), temp);
                                 }
@@ -236,8 +231,6 @@ public class Worker implements Runnable{
                             else {
                                 f.updateByte(packet.getTotalSize());
                                 flows.put(f.check(), f);
-                                if (!s_IP.equals("10.23.194.252")) f.in();
-                                else f.out();
                             }
                         } 
                     }
@@ -249,28 +242,18 @@ public class Worker implements Runnable{
                             if (uflows.containsKey(f.check())){
                                 f.destroy();
                                 temp = (UFlow) uflows.get(f.check());
-                                if (!s_IP.equals("10.23.194.252")) 
-                                    temp.in();
-                                else 
-                                    temp.out();
                                 temp.updateByte(packet.getPacketWirelen());
                                 uflows.put(f.check(), temp);
                             }
                             else if (uflows.containsKey(f.check2())){
                                 f.destroy();
                                 temp = (UFlow) uflows.get(f.check2());
-                                    if (!s_IP.equals("10.23.194.252"))
-                                        temp.in();
-                                    else 
-                                        temp.out();
                                     temp.updateByte(packet.getPacketWirelen());
                                     uflows.put(f.check2(), temp);
                             }
                             else {
                                 f.updateByte(packet.getTotalSize());
                                 uflows.put(f.check(), f);
-                                if (!s_IP.equals("10.23.194.252")) f.in();
-                                else f.out();
                             }
                         }
                         
@@ -280,14 +263,10 @@ public class Worker implements Runnable{
                             if (flows.containsKey(f.check())){
                                 temp = flows.get(f.check());
                                 if (packet.getHeader(tcp).flags_FIN() && s_IP.equals(str)) {
-                                    System.out.println(temp.End());
-                                    //System.out.println(flows.remove(f.check()));
+                                    temp.End();
+                                    flows.remove(f.check());
                                 }
                                 else{
-                                    if (!s_IP.equals("10.23.194.252")) 
-                                        temp.in();
-                                    else 
-                                        temp.out();
                                     temp.updateByte(packet.getPacketWirelen());
                                     flows.put(f.check(), temp);
                                 }
@@ -295,14 +274,10 @@ public class Worker implements Runnable{
                             else if (flows.containsKey(f.check2())){
                                 temp = flows.get(f.check2());
                                 if (packet.getHeader(tcp).flags_FIN() && !s_IP.equals(str)) {
-                                    System.out.println(temp.End());
-                                    //System.out.println(flows.remove(f.check()));
+                                    temp.End();
+                                    flows.remove(f.check());
                                 }
                                 else{
-                                    if (!s_IP.equals("10.23.194.252")){
-                                        temp.in();
-                                    }
-                                    else temp.out();
                                     temp.updateByte(packet.getPacketWirelen());
                                     flows.put(f.check2(), temp);
                                 }
@@ -311,8 +286,6 @@ public class Worker implements Runnable{
                             else {
                                 f.updateByte(packet.getTotalSize());
                                 flows.put(f.check(), f);
-                                if (!s_IP.equals("10.23.194.252")) f.in();
-                                else f.out();
                             }
                         }
                     }

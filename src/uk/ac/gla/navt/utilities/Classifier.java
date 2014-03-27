@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package uk.ac.gla.navt.utilities;
 
 import java.io.File;
@@ -12,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import net.sf.javaml.classification.KDtreeKNN;
 import net.sf.javaml.classification.KNearestNeighbors;
-import net.sf.javaml.classification.SOM;
 import net.sf.javaml.classification.bayes.NaiveBayesClassifier;
 import net.sf.javaml.classification.evaluation.CrossValidation;
 import net.sf.javaml.classification.evaluation.PerformanceMeasure;
@@ -34,15 +27,21 @@ public class Classifier{
     KDtreeKNN tKNN;
             
     public Classifier() throws IOException {
-        data = FileHandler.loadDataset(new File("/home/mkdeniz/Desktop/format.csv"), 4, ",");
+        data = FileHandler.loadDataset(new File("/home/mkdeniz/Desktop/formatted_flows.csv"), 4, ",");
         for (Instance inst : data) {
         	inst.removeAttribute(0);
         	inst.removeAttribute(1);
         }
         NB = new NaiveBayesClassifier(true,true,false);
+        long start = System.currentTimeMillis();
         NB.buildClassifier(data);
+        long elapsedTime = System.currentTimeMillis() - start;
+        System.out.println("\n"+elapsedTime);
         KNN = new KNearestNeighbors(2);
+        start = System.currentTimeMillis();
         KNN.buildClassifier(data);
+        elapsedTime = System.currentTimeMillis() - start;
+        System.out.println("\n"+elapsedTime);
         tKNN = new KDtreeKNN(2);
     }
     
@@ -85,14 +84,19 @@ public class Classifier{
     
     public HashMap<Integer, Double> CrossValidationKNN() {
         HashMap<Integer,Double> hm = new HashMap<>();
-        for (int k = 1; k < 11; k++ ) {
+        for (int k = 3; k < 5; k++ ) {
             KNN = new KNearestNeighbors(k);
             CrossValidation cv = new CrossValidation(KNN);
+            long start = System.currentTimeMillis();
             Map<Object, PerformanceMeasure> CV = cv.crossValidation(data);
+            long elapsedTime = System.currentTimeMillis() - start;
             double d = 0;
+            
             for ( Object o :CV.keySet())
                 d = d + (CV.get(o).getAccuracy()*100);
             double acc = d/CV.size();
+            
+            System.out.println("\n"+elapsedTime);
             hm.put(k, acc);
         }
         return hm;
@@ -104,16 +108,23 @@ public class Classifier{
 	double d = 0;
 	for ( Object o :CV.keySet())
             d = d + (CV.get(o).getAccuracy()*100);
+        System.out.print(CV);
 	return d/CV.size();
     }
     
     public static void main(String[] args) throws IOException {
         Classifier c = new Classifier();
+        long start = System.currentTimeMillis();
         System.out.println("Accuracy of NB: " + c.CrossValidationNB());
+        long elapsedTime = System.currentTimeMillis() - start;
+        System.out.println("\n"+elapsedTime);
         HashMap<Integer,Double> result = c.CrossValidationKNN();
         System.out.println("Accuracy of KNN: ");
         for (Integer key : result.keySet()) {
+            start = System.currentTimeMillis();
             System.out.print("K="+key+" : "+result.get(key));
+            elapsedTime = System.currentTimeMillis() - start;
+            System.out.print(elapsedTime);
         }
     }
     

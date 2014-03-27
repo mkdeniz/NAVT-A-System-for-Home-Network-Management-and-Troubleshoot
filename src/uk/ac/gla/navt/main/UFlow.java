@@ -17,13 +17,14 @@ public class UFlow extends Flow{
     ActionListener updateRRD = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.print(End());
+                End();
                 destroy();
             }
         };
     
     public void destroy(){
         timer.stop();
+        
     }
     
     @Override

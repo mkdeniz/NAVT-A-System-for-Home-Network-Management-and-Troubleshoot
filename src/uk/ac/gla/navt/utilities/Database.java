@@ -13,6 +13,8 @@ import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
+import org.jrobin.core.Sample;
+import org.jrobin.core.Util;
 import org.jrobin.graph.RrdGraphDef;
 
 /**
@@ -27,12 +29,40 @@ public class Database {
         file = f;
     }
     
-    public void prepareRrd() throws IOException, RrdException {
+    public void prepareRRDB() throws IOException, RrdException {
         RrdDef rrdDef = new RrdDef(this.file, 5);
-        rrdDef.addDatasource("a", "GAUGE", 600, Double.NaN, Double.NaN);
-        rrdDef.addDatasource("b", "GAUGE", 600, Double.NaN, Double.NaN);
-        rrdDef.addArchive("AVERAGE", 0.5, 1, 1000);
+        rrdDef.addDatasource("a", "GAUGE", 2, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("b", "GAUGE", 2, Double.NaN, Double.NaN);
+        rrdDef.addArchive("AVERAGE", 0.5, 1, 600);
         RrdDb rrdDb = new RrdDb(rrdDef, RrdBackendFactory.getFactory("MEMORY"));
+        rrdDb.close();
+    }
+    
+    public void prepareRRDC() throws IOException, RrdException {
+        RrdDef rrdDef = new RrdDef("classification.rrd");
+        rrdDef.addDatasource("WEB", "GAUGE", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("BULK", "GAUGE", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("P2P", "GAUGE", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("SERVICE", "GAUGE", 600, Double.NaN, Double.NaN);
+        rrdDef.addArchive("AVERAGE", 0.5, 1, 1000);
+        RrdDb rrdDb = new RrdDb(rrdDef);
+        rrdDb.close();
+    }
+    
+    public void test(int N) throws IOException, RrdException, InterruptedException {
+        RrdDb rrdDb = new RrdDb("classification.rrd");
+        Sample sample = rrdDb.createSample();
+        for (int i = 1; i<N; i++){
+            sample.setTime(Util.getTimestamp());
+                    sample.setValue("WEB", i);
+                    if (N % 2 == 0){
+                    sample.setValue("BULK", i);}
+                    if (N > 30){
+                    sample.setValue("P2P", i);}
+                    sample.setValue("SERVICE", i*2);
+                    sample.update();
+                    Thread.sleep(1200);
+        }
         rrdDb.close();
     }
     

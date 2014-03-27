@@ -13,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
-import uk.ac.gla.navt.ui.SplashScreen;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
 import org.jrobin.core.RrdException;
@@ -28,8 +27,8 @@ public class Welcome extends JDialog implements ActionListener{
     private JComboBox petList;
     private JButton button;
     private JTextField field;
-    int n;
-    String st;
+    private int n;
+    private String st;
     private List<PcapIf> alldevs;
     
     
