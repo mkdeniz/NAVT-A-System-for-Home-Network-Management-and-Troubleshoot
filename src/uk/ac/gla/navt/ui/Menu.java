@@ -1,8 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/**
+* A menu class to provide options
+* 
+* @Author Mehmet Kemal Deniz
+* @Date 27/03/2014
+*/
 
 package uk.ac.gla.navt.ui;
 
@@ -17,8 +18,6 @@ import javax.swing.JMenuItem;
  */
 public class Menu extends JMenu implements ActionListener{
     
-   
-    
     public Menu(String s){
         super(s);
         JMenuItem menuItem = new JMenuItem("About");
@@ -26,15 +25,12 @@ public class Menu extends JMenu implements ActionListener{
         this.add(Help);
         Help.addActionListener(
             new ActionListener() { 
+                @Override
                 public void actionPerformed(ActionEvent ev) {
-                    new About();    
+                    About a = new About();    
                     }
                 }
         );
-        
-        
-        //petList = new JComboBox((Vector) petStrings);
-        
         
         this.addSeparator();
         JMenuItem menuItem2 = new JMenuItem("Exit");

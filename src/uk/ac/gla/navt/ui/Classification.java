@@ -1,5 +1,11 @@
-
 package uk.ac.gla.navt.ui;
+
+/**
+* A Panel to provide classification results.
+* 
+* @Author Mehmet Kemal Deniz
+* @Date 27/03/2014
+*/
 
 import java.awt.Color;
 import java.awt.Dimension;

@@ -1,5 +1,12 @@
 package uk.ac.gla.navt.ui;
 
+/**
+* A panel to provide DNS tests.
+* 
+* @Author Mehmet Kemal Deniz
+* @Date 27/03/2014
+*/
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -32,9 +39,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
         sidePanel .setSize(20,100);
         sidePanel.add(submit);
         
-        //Results.add(submit);
         add(Results);
-        //add(sidePanel);
         
         w = new MonitorWorker();
         w.run();

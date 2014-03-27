@@ -23,54 +23,49 @@ import org.jrobin.core.RrdException;
  */
 public class Welcome extends JDialog implements ActionListener{
     
-    private static final String rrd = "file.rrd";
-    private JComboBox petList;
-    private JButton button;
-    private JTextField field;
-    private int n;
-    private String st;
-    private List<PcapIf> alldevs;
+    protected static final String rrd = "file.rrd";
+    protected JComboBox List;
+    protected JButton button;
+    protected JTextField field;
+    protected int n;
+    protected String st;
+    protected List<PcapIf> alldevs;
+    protected Vector<String> deviceList;
+    protected StringBuilder errbuf;
     
     
     public Welcome(){
         super();
-        alldevs = new ArrayList<>(); // Will be filled with NICs  
-        StringBuilder errbuf = new StringBuilder(); // For any error msgs  
+        alldevs = new ArrayList<>();
+        errbuf = new StringBuilder();
+        Pcap.findAllDevs(alldevs, errbuf); 
         
-        int r = Pcap.findAllDevs(alldevs, errbuf);  
-        if (alldevs.isEmpty()) {  
-            System.err.printf("Can't read list of devices, error is %s", errbuf.toString());  
-            return;  
-        }
-        
-        Vector<String> petStrings = new Vector<String>();
-        
-        int i = 0;  
-        for (PcapIf device : alldevs) {  
-            String description =  
-                (device.getDescription() != null) ? device.getDescription()  
-                    : "No description available";  
-            petStrings.add(device.getName());
+        deviceList = new Vector<>();
+        for (PcapIf device : alldevs) {
+            deviceList.add(device.getName());
         }  
+        List = new JComboBox((Vector) deviceList);
         
-        petList = new JComboBox((Vector) petStrings);
         button = new JButton("GO");
-        field = new JTextField();
-        this.add(petList, BorderLayout.PAGE_START);
-        this.add(button, BorderLayout.PAGE_END);
-        this.add(field, BorderLayout.CENTER);
-        this.setVisible(true);
-        this.setSize(250, 100);
         button.addActionListener(this);
-     
+        
+        field = new JTextField();
+        
+        add(List, BorderLayout.PAGE_START);
+        add(button, BorderLayout.PAGE_END);
+        add(field, BorderLayout.CENTER);
+        setVisible(true);
+        setSize(250, 100);
+        
     }
     
     @Override
     public void actionPerformed(ActionEvent e){
         st = field.getText();
-        n = petList.getSelectedIndex();
-        String[] host = st.split("\\.");
-        if (st.length()>2) {
+        n = List.getSelectedIndex();
+        String[] host;
+        host = st.split("\\.");
+        if (st.length() > 2) {
             this.dispose();
             Thread thread = new Thread() {
                 @Override
@@ -87,8 +82,7 @@ public class Welcome extends JDialog implements ActionListener{
     }
     
     public static void main(String[] args) {
-        
-        new Welcome();
+        Welcome w = new Welcome();
     }
                 
 }

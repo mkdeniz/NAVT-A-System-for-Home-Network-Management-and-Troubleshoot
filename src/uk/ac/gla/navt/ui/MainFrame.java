@@ -1,5 +1,12 @@
 package uk.ac.gla.navt.ui;
 
+/**
+* A panel to provide DNS tests.
+* 
+* @Author Mehmet Kemal Deniz
+* @Date 27/03/2014
+*/
+
 import uk.ac.gla.navt.utilities.Database;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -121,7 +128,7 @@ public class MainFrame extends JFrame {
         jtp.addTab("Classification", c);
         jtp.setMnemonicAt(0, KeyEvent.VK_1);
         Thread.sleep(1000);
-        jpControlTab.add(new Statistics(this,Result), BorderLayout.CENTER);
+        jpControlTab.add(new Overview(this,Result), BorderLayout.CENTER);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(450,350);
         this.setLocationByPlatform(true);
