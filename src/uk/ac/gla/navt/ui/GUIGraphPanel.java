@@ -20,7 +20,7 @@ public class GUIGraphPanel extends JPanel {
     /**
      * Default Constructor
      * 
-     * @throws InterruptedException
+     * @param g RRD graph
      */
     public GUIGraphPanel(RrdGraph g) {
         graph = g;

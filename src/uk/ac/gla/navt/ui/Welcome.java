@@ -3,19 +3,15 @@ package uk.ac.gla.navt.ui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;
-import org.jrobin.core.RrdException;
 
 /**
  *
@@ -70,11 +66,7 @@ public class Welcome extends JDialog implements ActionListener{
             Thread thread = new Thread() {
                 @Override
                 public void run() {
-                    try {
-                        MainFrame mainFrame = new MainFrame(n,st);
-                    } catch (RrdException | IOException | InterruptedException ex) {
-                        Logger.getLogger(Welcome.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    MainFrame mainFrame = new MainFrame(n,st);
                 }
             };
             thread.start();

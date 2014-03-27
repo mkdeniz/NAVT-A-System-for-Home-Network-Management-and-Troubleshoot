@@ -30,6 +30,7 @@ import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
 public class Classification extends JPanel implements ActionListener {
+    
     protected String name = "classification.rrd";
     protected JCheckBox wBox,bBox,sBox,pBox,oBox;
     protected Dimension d = this.getSize();
