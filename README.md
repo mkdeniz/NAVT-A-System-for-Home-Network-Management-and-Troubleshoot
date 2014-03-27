@@ -14,4 +14,4 @@ the home gateway, and use callbacks to report usage statistics to trusted hosts.
 per-host network activity, and would ideally be extensible to accommodate new troubleshooting and diagnostic 
 operations.
 
-http://pastebin.com/y5M63uNS
+http://pastebin.com/rDa8nGwP
