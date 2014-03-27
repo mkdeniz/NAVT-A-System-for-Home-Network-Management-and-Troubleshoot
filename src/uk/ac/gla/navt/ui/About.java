@@ -1,7 +1,7 @@
 package uk.ac.gla.navt.ui;
  
 /**
-* An about panel
+* An about panel which extends JDialog
 * 
 * @Author Mehmet Kemal Deniz
 * @Date 27/03/2014
@@ -19,18 +19,18 @@ public class About extends JDialog implements ActionListener {
     public About() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        Color bgColor = panel.getBackground();
         getContentPane().add(panel, BorderLayout.CENTER);
         
         JPanel textPanel = new JPanel();
         String strHelp = "Copyright 2014 - Mehmet Kemal Deniz\n\n" +
             "University of Glasgow - 4th Year Project" ;
-        JTextArea jtaHelpText = new JTextArea(strHelp, 15, 30);
-        jtaHelpText.setLineWrap(true);
-        jtaHelpText.setWrapStyleWord(true);
-        jtaHelpText.setEditable(false);
-        jtaHelpText.setBackground(bgColor);
-        textPanel.add(jtaHelpText,BorderLayout.CENTER);
+        JTextArea textArea = new JTextArea(strHelp, 15, 30);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setEditable(false);
+        Color bgColor = panel.getBackground();
+        textArea.setBackground(bgColor);
+        textPanel.add(textArea,BorderLayout.CENTER);
         panel.add(textPanel,BorderLayout.CENTER);
         
         JPanel buttonPanel = new JPanel();

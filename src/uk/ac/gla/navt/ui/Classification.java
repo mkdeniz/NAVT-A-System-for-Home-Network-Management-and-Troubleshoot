@@ -29,15 +29,11 @@ import org.jrobin.graph.ChartPanel;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
-/**
- *
- * @author root
- */
 public class Classification extends JPanel implements ActionListener {
     
     protected String name = "classification.rrd";
     protected JButton submit;
-    protected JCheckBox tBox,uBox,dBox,iBox,hBox;
+    protected JCheckBox wBox,bBox,sBox,pBox,oBox;
     protected JFrame frame;
     protected JPanel panel;
     protected Dimension d = this.getSize();
@@ -51,20 +47,20 @@ public class Classification extends JPanel implements ActionListener {
         JPanel j2 = new JPanel();
         j1.setBorder(new TitledBorder("Options"));
         
-        tBox = new JCheckBox("WEB");
-        j1.add(tBox);
+        wBox = new JCheckBox("WEB");
+        j1.add(wBox);
         
-        uBox = new JCheckBox("BULK");
-        j1.add(uBox);
+        bBox = new JCheckBox("BULK");
+        j1.add(bBox);
         
-        dBox = new JCheckBox("SERVICES");
-        j1.add(dBox);
+        sBox = new JCheckBox("SERVICES");
+        j1.add(sBox);
         
-        iBox = new JCheckBox("P2P");
-        j1.add(iBox);
+        pBox = new JCheckBox("P2P");
+        j1.add(pBox);
         
-        hBox = new JCheckBox("OTHER");
-        j1.add(hBox);
+        oBox = new JCheckBox("OTHER");
+        j1.add(oBox);
         
         submit = new JButton("Submit");
         j2.add(submit);
@@ -82,28 +78,27 @@ public class Classification extends JPanel implements ActionListener {
             Date endTime = new Date();
             Date startTime = new Date(endTime.getTime() - 864000 * 10L);
             graphDef.setTimePeriod(startTime, endTime);
-            if (tBox.isSelected()){
+            if (wBox.isSelected()){
                 graphDef.datasource("WEB", name, "WEB", "AVERAGE");
                 graphDef.area("WEB", new Color(0, 0xFF, 0), "WEB");
             }
-            if (uBox.isSelected()) {
+            if (bBox.isSelected()) {
                 graphDef.datasource("BULK", name, "BULK", "AVERAGE");
                 graphDef.area("BULK", Color.YELLOW, "BULK");
             }
-            if (dBox.isSelected()) {
+            if (sBox.isSelected()) {
                 graphDef.datasource("SERVICE", name, "SERVICE", "AVERAGE");
                 graphDef.area("SERVICE", Color.BLUE, "SERVICE");
             }
-            if (iBox.isSelected()) {
+            if (pBox.isSelected()) {
                 graphDef.datasource("P2P", name, "P2P", "AVERAGE");
                 graphDef.area("P2P", Color.BLACK, "P2P");
             }
-            if (hBox.isSelected()) {
-                graphDef.datasource("ihttp", name, "ihttp", "AVERAGE");
-                graphDef.area("ihttp", Color.CYAN, "in-HTTP");
-                graphDef.datasource("ohttp", name, "ohttp", "AVERAGE");
-                graphDef.area("ohttp", Color.GREEN, "out-HTTP");
+            if (oBox.isSelected()) {
+                graphDef.datasource("OTHER", name, "OTHER", "AVERAGE");
+                graphDef.area("OTHER", Color.BLACK, "OTHER");
             }
+            
             RrdGraph graph = new RrdGraph(graphDef);
             graph.saveAsGIF("Classification.gif");
             graphPanel = new GUIGraphPanel(graph);
@@ -118,9 +113,7 @@ public class Classification extends JPanel implements ActionListener {
             });
             j.setSize(350, 350);
             j.setVisible(true);
-        } catch (RrdException ex) {
-            Logger.getLogger(Classification.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (RrdException | IOException ex) {
             Logger.getLogger(Classification.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
