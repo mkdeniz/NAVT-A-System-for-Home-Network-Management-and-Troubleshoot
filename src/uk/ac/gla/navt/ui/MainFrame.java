@@ -137,6 +137,8 @@ public class MainFrame extends JFrame {
         tabs.addTab("Classification", c);
         tabs.setMnemonicAt(0, KeyEvent.VK_1);
         jpControlTab.add(new Overview(this,Result), BorderLayout.CENTER);
+        
+        //Main Frame features
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(450,350);
         this.setLocationByPlatform(true);
