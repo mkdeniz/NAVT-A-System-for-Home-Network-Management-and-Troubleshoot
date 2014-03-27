@@ -17,32 +17,43 @@ import javax.swing.border.TitledBorder;
 public class Overview extends JPanel{
    
     protected JLabel Overall;
+    protected JLabel DNS;
     
-    public Overview (JFrame f,String result){
+    /**
+     *
+     * Default Constructor
+     * 
+     * @param f main frame
+     * @param r result of DNS tests
+     * 
+     * */
+    public Overview (JFrame f, String r){
         super(new GridLayout(1,1));
         JPanel j1 =  new JPanel(new GridLayout(3,3));
         j1.setSize(f.getWidth()/2, 100);
         j1.setBorder(new TitledBorder("Overview"));
         
-        JLabel DNS;
-        if (Integer.parseInt(result) > 0){
-            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
-            DNS = new JLabel("DNS");
-            DNS.setIcon(img3);
-        }
-        else {
-            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
-            DNS = new JLabel("DNS");
+        DNS = new JLabel("DNS");
+        //Check for problems
+        if (Integer.parseInt(r) > 0){
+            ImageIcon img3 = new ImageIcon("images/green.png");
             DNS.setIcon(img3);
         }
         
-        if (Integer.parseInt(result) > 0){
-            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/green.png");
+        else {
+            ImageIcon img3 = new ImageIcon("images/red.png");
+            DNS.setIcon(img3);
+        }
+        
+        //Check for problems
+        if (Integer.parseInt(r) > 0){
+            ImageIcon img3 = new ImageIcon("images/green.png");
             Overall = new JLabel("No Problems Detected");
             Overall.setIcon(img3);
         }
+        
         else {
-            ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
+            ImageIcon img3 = new ImageIcon("images/red.png");
             Overall = new JLabel("Problem Detected");
             Overall.setIcon(img3);
         }
@@ -51,7 +62,7 @@ public class Overview extends JPanel{
         j1.add(Overall);
         
         add(j1);
-        this.setSize(300, 300);
+        setSize(300, 300);
     }
 }
 
