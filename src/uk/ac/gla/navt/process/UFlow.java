@@ -1,4 +1,4 @@
-package uk.ac.gla.navt.main;
+package uk.ac.gla.navt.process;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

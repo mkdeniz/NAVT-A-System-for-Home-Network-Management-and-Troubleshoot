@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package uk.ac.gla.navt.main;
+package uk.ac.gla.navt.process;
 
 import uk.ac.gla.navt.ui.GUIGraphPanel;
 import java.awt.Color;

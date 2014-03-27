@@ -30,7 +30,7 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.DefaultTableModel;
-import uk.ac.gla.navt.main.Worker;
+import uk.ac.gla.navt.process.Worker;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
