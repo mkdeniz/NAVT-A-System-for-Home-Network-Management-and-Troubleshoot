@@ -1,3 +1,5 @@
+package uk.ac.gla.navt.process;
+
 /**
  * A UDP Flow object class which extend Flow Class to allow flow creation 
  * and statistical value calculation such as variance and mean of the flow 
@@ -13,7 +15,7 @@ import java.awt.event.ActionListener;
 import java.util.Date;
 import javax.swing.Timer;
 
-public class UFlow extends Flow{
+public class UFlow extends Flow {
     //Timer to end UDP flows
     Timer timer;
     

@@ -1,3 +1,5 @@
+package uk.ac.gla.navt.process;
+
 
 /**
  * A Flow object class to allow flow creation and statistical value calculation
@@ -123,7 +125,7 @@ public class Flow {
     /**
      * A method to update flow
      * 
-     * @param byte total bytes in the packet
+     * @param b total bytes in the packet
      * 
      * */
     public void updateByte(long b) {
@@ -160,6 +162,18 @@ public class Flow {
         double dur = (end.getTime() - start.getTime())/1000; //seconds
         if (dur == 0 || tmp == 0) return 0;
         return tmp/dur; 
+    }
+    
+    public String check() {
+        String s = "";
+        s = s + this.s_ip + " : " + this.s_port + " : " + this.d_ip + " : " + this.d_port;
+        return s;
+    }
+    
+    public String check2() {
+        String s = "";
+        s = s + this.d_ip + " : " + this.d_port + " : " + this.s_ip + " : " + this.s_port;
+        return s;
     }
          
 }
