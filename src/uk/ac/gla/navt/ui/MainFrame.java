@@ -91,7 +91,7 @@ public class MainFrame extends JFrame {
             //Preparing Menus
             JMenuBar greenMenuBar = new JMenuBar();
             setJMenuBar(greenMenuBar);
-            Menu menu = new Menu("Menu");
+            Menu menu = new Menu();
             greenMenuBar.add(menu);
             prepareStatus();
             
