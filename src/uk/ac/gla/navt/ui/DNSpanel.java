@@ -129,16 +129,9 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 }
             }
             else {
-                ImageIcon img3 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
+                ImageIcon img3 = new ImageIcon("images/red.png");
                 l3 = new JLabel("You have no Internet Connection\n. Contact your ISP");
                 l3.setIcon(img3); 
-                ImageIcon img= new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
-                l1 = new JLabel("\nOpenDNS Test");
-                l1.setIcon(img);
-                ImageIcon img1 = new ImageIcon("/home/mkdeniz/Dropbox/University/Year4/Project/Images/red.png");
-                l = new JLabel("\nGoogle DNS");l.setIcon(img1);
-                Results.add(l1);
-                Results.add(l);
             }
             
             Results.add(l3);
