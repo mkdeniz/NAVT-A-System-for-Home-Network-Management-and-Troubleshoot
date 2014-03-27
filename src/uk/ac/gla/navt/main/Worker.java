@@ -11,7 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel;
 import org.jnetpcap.Pcap;
@@ -34,20 +33,13 @@ public class Worker implements Runnable{
     protected JFrame frame;
     protected RrdGraphDef gDef;
     protected final String rrd = "file.rrd";
-    protected final String name = "/home/mkdeniz/tcp.rdd";
     protected Flow f;
     protected int num;
     protected String str;
-    protected JPanel id;
     protected String str2 = "";
     protected JLabel label;
-    protected JLabel test = new JLabel();
     protected RrdDb rrdDb;
-    protected RrdDb rrd1;
-    protected RrdDb rrd2;
     protected Sample sample;
-    protected Sample sample2;
-    protected Sample sample3;
     protected long count;
     protected long ucount;
     protected Ip4 ip;
@@ -70,27 +62,11 @@ public class Worker implements Runnable{
         str = s;
         label = l;
         Timer t = new Timer(1100, updateRRD);
-        Timer t2 = new Timer(10000, removeUDP);
-        Timer t3 = new Timer(3600000, refresh);
+        Timer t2 = new Timer(3600000, refresh);
         t.start();
-        t2.start();
         rrdDb = new RrdDb(rrd, RrdBackendFactory.getFactory("MEMORY"));
         sample = rrdDb.createSample();
     }
-    
-    ActionListener removeUDP = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for(String str : uflows.keySet()){
-                    if (!uflows.get(str).open)
-                        uflows.remove(str);
-                }  
-                for(String str : flows.keySet()){
-                    if (!flows.get(str).open)
-                        flows.remove(str);
-                }  
-            }
-        };
     
     ActionListener refresh = new ActionListener() {
             @Override
@@ -124,6 +100,84 @@ public class Worker implements Runnable{
             }
         };
 
+    public void processUDP(String s_IP, String d_IP, int s_P, int d_P, long b) {
+        UFlow uf = new UFlow(s_IP, d_IP, s_P, d_P, b);
+        UFlow temp;
+        if (uflows.containsKey(uf.check())){
+            temp = uflows.get(uf.check());
+            temp.updateByte(b);
+            uflows.put(uf.check(), temp);
+            uf.destroy();
+        }
+        
+        else if (uflows.containsKey(uf.check2())){
+            temp = uflows.get(uf.check2());
+            temp.updateByte(b);
+            uflows.put(uf.check2(), temp);
+            uf.destroy();
+        }
+        
+        else {
+            uf.updateByte(b);
+            uflows.put(uf.check(), uf);
+        }
+    }
+    
+    public void processTCP(String s_IP, String d_IP, int s_P, int d_P, long b, boolean flag) {
+        Flow tf = new Flow(s_IP, d_IP, s_P, d_P, b);
+        Flow temp;
+        if (flows.containsKey(tf.check())){
+            temp = flows.get(tf.check());
+            if (flag && s_IP.equals(str)) {
+               temp.End();
+               flows.remove(tf.check());
+            }
+            else{
+                temp.updateByte(b);
+                flows.put(tf.check(), temp);
+            }
+        }
+        else if (flows.containsKey(tf.check2())){
+            temp = flows.get(tf.check2());
+            if (flag && !s_IP.equals(str)) {
+                temp.End();
+                flows.remove(tf.check());
+            }
+            else{
+                temp.updateByte(b);
+                flows.put(tf.check2(), temp);
+            }
+        }
+
+        else {
+            tf.updateByte(b);
+            flows.put(tf.check(), tf);
+        }
+    }
+    
+    @SuppressWarnings("empty-statement")
+    public void processDHCP(String s_IP, String d_IP, PcapPacket packet, DefaultTableModel model){
+        int n = (packet.toHexdump().indexOf("0110:"));
+        String type_dhcp = packet.toHexdump().substring(n+46, n+45+2);
+            switch (type_dhcp) {
+                case "1":
+                     model.addRow(new Object[]{"DHCP Discovery",s_IP + " : "+ d_IP});
+                    break;
+                case "2":
+                    model.addRow(new Object[]{"DHCP Offer",s_IP+" : "+d_IP});
+                    break;
+                case "3":
+                    model.addRow(new Object[]{"DHCP Request",s_IP+" : "+d_IP});
+                    break;
+                case "5":
+                    model.addRow(new Object[]{"DHCP Ack",s_IP+" : "+d_IP});
+                    break;
+                case "7":
+                    model.addRow(new Object[]{"DHCP Release - ",s_IP+" : "+d_IP});
+                    break;
+            }
+    }
+    
     @Override
     public void run() {
         String[] host = str.split("\\.");
@@ -159,135 +213,26 @@ public class Worker implements Runnable{
                     String d_IP = org.jnetpcap.packet.format.FormatUtils.ip(dIP);
                     if (packet.hasHeader(udp)){
                         if (packet.getHeader(udp).destination() == 68 ||packet.getHeader(udp).source() == 68   || packet.getHeader(udp).destination() == 67 || packet.getHeader(udp).source() == 67) {
-                        int n = (packet.toHexdump().indexOf("0110:"));
-                        String type_dhcp = packet.toHexdump().substring(n+46, n+45+2);
-                            switch (type_dhcp) {
-                                case "1":
-                                     tableModel.addRow(new Object[]{"DHCP Discovery",s_IP + " : "+ d_IP});
-                                    break;
-                                case "2":
-                                    tableModel.addRow(new Object[]{"DHCP Offer",s_IP+" : "+d_IP});
-                                    break;
-                                case "3":
-                                    tableModel.addRow(new Object[]{"DHCP Request",s_IP+" : "+d_IP});
-                                    break;
-                                case "5":
-                                    tableModel.addRow(new Object[]{"DHCP Ack",s_IP+" : "+d_IP});
-                                    break;
-                                case "7":
-                                    tableModel.addRow(new Object[]{"DHCP Release - ",s_IP+" : "+d_IP});
-                                    break;
-                            }
+                            processDHCP(s_IP, d_IP, packet,tableModel);
                         }
                     }
-                    if (!s_IP.equals(str)){// && !s_IP.startsWith(str2)){
+                    if (!s_IP.equals(str)){
                         count = count + packet.getPacketWirelen();
                         if (packet.hasHeader(udp)){
-                            UFlow f = new UFlow(s_IP,d_IP,packet.getHeader(udp).source(),packet.getHeader(udp).destination(),packet.getTotalSize());
-                            UFlow temp;
-                            if (uflows.containsKey(f.check())){
-                                f.destroy();
-                                temp = (UFlow) uflows.get(f.check());
-                                temp.updateByte(packet.getPacketWirelen());
-                                uflows.put(f.check(), temp);
-                            }
-                            else if (uflows.containsKey(f.check2())){
-                                f.destroy();
-                                temp = (UFlow) uflows.get(f.check2());
-                                    temp.updateByte(packet.getPacketWirelen());
-                                    uflows.put(f.check2(), temp);
-                            }
-                            else {
-                                f.updateByte(packet.getTotalSize());
-                                uflows.put(f.check(), f);
-                            }
+                            processUDP(s_IP, d_IP, packet.getHeader(udp).source(), packet.getHeader(udp).destination(), packet.getPacketWirelen());
                         }
                         else if (packet.hasHeader(tcp)) {
-                            Flow f = new Flow(s_IP,d_IP,packet.getHeader(tcp).source(),packet.getHeader(tcp).destination(),packet.getTotalSize());
-                            Flow temp;
-                            if (flows.containsKey(f.check())){
-                                temp = flows.get(f.check());
-                                if (packet.getHeader(tcp).flags_FIN() && s_IP.equals(str)) {
-                                   temp.End();
-                                   flows.remove(f.check());
-                                }
-                                else{
-                                    temp.updateByte(packet.getPacketWirelen());
-                                    flows.put(f.check(), temp);
-                                }
-                            }
-                            else if (flows.containsKey(f.check2())){
-                                temp = flows.get(f.check2());
-                                if (packet.getHeader(tcp).flags_FIN() && !s_IP.equals(str)) {
-                                    temp.End();
-                                    flows.remove(f.check());
-                                }
-                                else{
-                                    temp.updateByte(packet.getPacketWirelen());
-                                    flows.put(f.check2(), temp);
-                                }
-                            }
-                            
-                            else {
-                                f.updateByte(packet.getTotalSize());
-                                flows.put(f.check(), f);
-                            }
+                            processTCP(s_IP, d_IP, packet.getHeader(tcp).source(), packet.getHeader(tcp).destination(), packet.getPacketWirelen(), packet.getHeader(tcp).flags_FIN());
                         } 
                     }
                     else if (s_IP.equals(str)){
                         ucount = ucount + packet.getPacketWirelen();
                         if (packet.hasHeader(udp)){
-                            UFlow f = new UFlow(s_IP,d_IP,packet.getHeader(udp).source(),packet.getHeader(udp).destination(),packet.getTotalSize());
-                            UFlow temp;
-                            if (uflows.containsKey(f.check())){
-                                f.destroy();
-                                temp = (UFlow) uflows.get(f.check());
-                                temp.updateByte(packet.getPacketWirelen());
-                                uflows.put(f.check(), temp);
-                            }
-                            else if (uflows.containsKey(f.check2())){
-                                f.destroy();
-                                temp = (UFlow) uflows.get(f.check2());
-                                    temp.updateByte(packet.getPacketWirelen());
-                                    uflows.put(f.check2(), temp);
-                            }
-                            else {
-                                f.updateByte(packet.getTotalSize());
-                                uflows.put(f.check(), f);
-                            }
+                            processUDP(s_IP, d_IP, packet.getHeader(udp).source(), packet.getHeader(udp).destination(), packet.getPacketWirelen());
                         }
-                        
                         else if (packet.hasHeader(tcp)) {
-                            Flow f = new Flow(s_IP,d_IP,packet.getHeader(tcp).source(),packet.getHeader(tcp).destination(),packet.getTotalSize());
-                            Flow temp;
-                            if (flows.containsKey(f.check())){
-                                temp = flows.get(f.check());
-                                if (packet.getHeader(tcp).flags_FIN() && s_IP.equals(str)) {
-                                    temp.End();
-                                    flows.remove(f.check());
-                                }
-                                else{
-                                    temp.updateByte(packet.getPacketWirelen());
-                                    flows.put(f.check(), temp);
-                                }
-                            }
-                            else if (flows.containsKey(f.check2())){
-                                temp = flows.get(f.check2());
-                                if (packet.getHeader(tcp).flags_FIN() && !s_IP.equals(str)) {
-                                    temp.End();
-                                    flows.remove(f.check());
-                                }
-                                else{
-                                    temp.updateByte(packet.getPacketWirelen());
-                                    flows.put(f.check2(), temp);
-                                }
-                            }
-                            
-                            else {
-                                f.updateByte(packet.getTotalSize());
-                                flows.put(f.check(), f);
-                            }
-                        }
+                            processTCP(s_IP, d_IP, packet.getHeader(tcp).source(), packet.getHeader(tcp).destination(), packet.getPacketWirelen(), packet.getHeader(tcp).flags_FIN());
+                        } 
                     }
                 }
             }
