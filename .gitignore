@@ -10,6 +10,7 @@ nbproject/*
  
 #java specific
 *.class
+*.rrd
  
 #general swap/backup files
 *.so
