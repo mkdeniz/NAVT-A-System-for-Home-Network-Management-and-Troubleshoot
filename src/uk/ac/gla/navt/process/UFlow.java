@@ -1,4 +1,12 @@
-package uk.ac.gla.navt.process;
+/**
+ * A UDP Flow object class which extend Flow Class to allow flow creation 
+ * and statistical value calculation such as variance and mean of the flow 
+ * features.
+ * 
+ * @Author Mehmet Kemal Deniz
+ * @Date 27/03/2014
+
+*/
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -6,34 +14,41 @@ import java.util.Date;
 import javax.swing.Timer;
 
 public class UFlow extends Flow{
+    //Timer to end UDP flows
     Timer timer;
     
     public UFlow(String s, String d, int sp, int dp, long t){
-        super(s,d,sp,dp,t);
-        timer = new Timer(10000, updateRRD);
+        super(s, d, sp, dp, t);//Same as Flow
+        timer = new Timer(10000, close);
         timer.start();
     }
+ 
+    /**
+     * Timer method to end flow
+     * 
+     */
+    ActionListener close = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            End();
+            destroy();
+        }
+    };
     
-    ActionListener updateRRD = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                End();
-                destroy();
-            }
-        };
-    
+    /**
+     * A Method to remove Timer
+     * 
+     */
     public void destroy(){
         timer.stop();
-        
     }
     
     @Override
     public double meanTime() {
         double sum = 0;
-        int l = arr.size();
+        int l = arrivalTimes.size();
         for (int i = 0; i < l; i++) {
-            double v = arr.get(i);
-            sum = sum + v;
+            sum = sum + arrivalTimes.get(i);
         }
         return (sum/(l));
             
@@ -42,10 +57,9 @@ public class UFlow extends Flow{
     @Override
     public double meanPacket() {
         double sum = 0;
-        int l = arr2.size();
+        int l = packetSizes.size();
         for (int i = 0; i < l; i++) {
-            double v = arr2.get(i);
-            sum = sum + v;
+            sum = sum + packetSizes.get(i);
         }
         return (sum/(l));
             
@@ -54,12 +68,10 @@ public class UFlow extends Flow{
     @Override
     public double varTime() {
         double sum = 0;
-        double v;
-        int l = arr.size();
+        int l = arrivalTimes.size();
         double mean = this.meanTime();
         for (int i = 0; i < l; i++){
-            v = arr.get(i);
-            sum = sum + Math.pow((mean-v), 2.0);
+            sum = sum + Math.pow((mean - arrivalTimes.get(i)), 2.0);
         }
         return Math.sqrt((sum/(l)))*0.001;
     }
@@ -68,11 +80,10 @@ public class UFlow extends Flow{
     public double varPacket() {
         double m = 0;
         double v;
-        int l = arr2.size();
+        int l = packetSizes.size();
         double mean = this.meanPacket();
         for (int i = 0; i < l; i++){
-            v = arr2.get(i);
-            m = m + Math.pow((mean-v), 2.0);
+            m = m + Math.pow((mean-packetSizes.get(i)), 2.0);
         }
         return (m/(l))/1024;
     }
@@ -80,15 +91,15 @@ public class UFlow extends Flow{
     @Override
     public void updateByte(long b) {
         if (this.open) {
-        timer.restart();
-            this.noPack++;
+            timer.restart();//Update timer
             Date tmp = new Date();
             double intV = tmp.getTime() - this.end.getTime();
-            this.end = tmp;
-            arr.add(intV);
-            double a = b;
-            arr2.add(a);
-            this.traffic = this.traffic + b;
+            end = tmp;
+            arrivalTimes.add(intV);
+            packetSizes.add((double)b);
+            traffic = this.traffic + b;
         }
     } 
 }
+
+
