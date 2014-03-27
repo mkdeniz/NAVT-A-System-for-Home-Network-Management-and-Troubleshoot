@@ -12,14 +12,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-/**
- *
- * @author root
- */
+
 public class Menu extends JMenu implements ActionListener{
     
-    public Menu(String s){
-        super(s);
+    /**
+     * 
+     * Default Constructor
+     * 
+     */
+    public Menu(){
+        super("Menu");
         JMenuItem menuItem = new JMenuItem("About");
         JMenuItem Help = new JMenuItem("About");
         this.add(Help);
