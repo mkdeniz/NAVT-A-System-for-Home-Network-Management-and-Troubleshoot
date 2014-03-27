@@ -1,7 +1,7 @@
 package uk.ac.gla.navt.ui;
 
 /**
-* A panel to provide DNS tests.
+* Main frame of the system that runs all the services
 * 
 * @Author Mehmet Kemal Deniz
 * @Date 27/03/2014
@@ -35,21 +35,19 @@ import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
-/**
- *
- * @author root
- */
 public class MainFrame extends JFrame {
     
-    protected JTabbedPane jtp  = new JTabbedPane();
     protected GUIGraphPanel graphPanel;
     protected String rrd = "file.rrd";
-    protected JPanel jpOutTab = new JPanel();
+    private final DNSpanel dPanel;
     protected JFrame frame;
     protected JLabel clock;
-    protected JLabel statusLabel;
-    private final DNSpanel dPanel;
     
+    /**
+     * 
+     * A method to create status bar down on the user interface
+     * 
+     */
     private void prepareStatus() {
         clock = new JLabel(new Date().toString());
         JPanel statusPanel = new JPanel();
@@ -57,12 +55,13 @@ public class MainFrame extends JFrame {
         this.add(statusPanel, BorderLayout.SOUTH);
         statusPanel.setPreferredSize(new Dimension(this.getWidth(), 16));
         statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
-        statusLabel = new JLabel("status");
+        JLabel statusLabel = new JLabel("status");
         statusLabel.setHorizontalAlignment(SwingConstants.LEFT);
         statusPanel.add(statusLabel);
         statusPanel.add(new JLabel("                              "));
         clock.setHorizontalAlignment(SwingConstants.RIGHT);
         statusPanel.add(clock);
+        
         ActionListener updateClockAction = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -73,15 +72,25 @@ public class MainFrame extends JFrame {
         t.start();
     }
     
-    public MainFrame(int n,String s) throws RrdException, IOException, InterruptedException {
+    /**
+     *
+     * Default Constructor
+     * 
+     * @param n Choice of NIC
+     * @param s IP of NIC
+     * 
+     */
+    public MainFrame(int n, String s){
         super(s);
         frame = this;
+        //Preparing Menus
         JMenuBar greenMenuBar = new JMenuBar();
         setJMenuBar(greenMenuBar);
         Menu menu = new Menu("Menu");
         greenMenuBar.add(menu);
         prepareStatus();
         
+        //Preparing databases and graphs
         System.out.print("System is preparing databases:");
         Database d = new Database(rrd);
         d.prepareRRDB();
@@ -89,7 +98,6 @@ public class MainFrame extends JFrame {
         
         RrdGraphDef gDef = d.prepareBandwith();
         RrdGraph graph = new RrdGraph(gDef);
-        
         graphPanel = new GUIGraphPanel(graph);
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -102,12 +110,12 @@ public class MainFrame extends JFrame {
         System.out.println(" Done");
         
         System.out.print("System is preparing panels:");
+        //Creating Events Tab and Panel
         JPanel Events = new JPanel(new GridLayout(1,0));
         JTable table = new JTable();
         JScrollPane pane = new JScrollPane(table);
         pane.setSize(200, 350 );
         DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Event","Source"},0);
-        
         table.setModel(tableModel);
         Events.add(pane);
         pane.setSize(350,450);
@@ -115,19 +123,19 @@ public class MainFrame extends JFrame {
         table.setSize(350,450);
         
         //Creating Tabs
+        JTabbedPane tabs  = new JTabbedPane();
         JPanel jpControlTab = new JPanel(new BorderLayout());
         Classification c = new Classification(this);
         dPanel = new DNSpanel();
         String Result = "" + dPanel.getResults();
         jpControlTab.add((new JLabel( Result)));
-        this.getContentPane().add(jtp); // outer tabbed pane
-        jtp.addTab("Overview", jpControlTab);
-        jtp.addTab("DNS", dPanel);
-        jtp.addTab("Bandwith", graphPanel);
-        jtp.addTab("Events", Events);
-        jtp.addTab("Classification", c);
-        jtp.setMnemonicAt(0, KeyEvent.VK_1);
-        Thread.sleep(1000);
+        this.getContentPane().add(tabs); // outer tabbed pane
+        tabs.addTab("Overview", jpControlTab);
+        tabs.addTab("DNS", dPanel);
+        tabs.addTab("Bandwith", graphPanel);
+        tabs.addTab("Events", Events);
+        tabs.addTab("Classification", c);
+        tabs.setMnemonicAt(0, KeyEvent.VK_1);
         jpControlTab.add(new Overview(this,Result), BorderLayout.CENTER);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(450,350);
@@ -139,6 +147,7 @@ public class MainFrame extends JFrame {
         Worker w = new Worker(this,gDef,n,s,tableModel,statusLabel);
         System.out.println(" Done");
         
+        //Run the worker
         w.run();
         
         
