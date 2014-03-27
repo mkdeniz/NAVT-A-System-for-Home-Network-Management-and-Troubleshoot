@@ -129,19 +129,20 @@ public class MainFrame extends JFrame {
             
             //Creating Tabs
             JTabbedPane tabs  = new JTabbedPane();
-            JPanel jpControlTab = new JPanel(new BorderLayout());
-            Classification c = new Classification(this);
+            JPanel Home = new JPanel(new BorderLayout());
+            Classification Class = new Classification(this);
             dPanel = new DNSpanel();
             String Result = "" + dPanel.getResults();
-            jpControlTab.add((new JLabel( Result)));
+            Home.add((new JLabel( Result)));
             this.getContentPane().add(tabs); // outer tabbed pane
-            tabs.addTab("Overview", jpControlTab);
+            
+            tabs.addTab("Overview", Home);
             tabs.addTab("DNS", dPanel);
             tabs.addTab("Bandwith", graphPanel);
             tabs.addTab("Events", Events);
-            tabs.addTab("Classification", c);
+            tabs.addTab("Classification", Class);
             tabs.setMnemonicAt(0, KeyEvent.VK_1);
-            jpControlTab.add(new Overview(this,Result), BorderLayout.CENTER);
+            Home.add(new Overview(this, Result), BorderLayout.CENTER);
             
             //Main Frame features
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
