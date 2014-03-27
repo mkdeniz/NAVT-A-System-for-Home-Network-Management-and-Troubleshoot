@@ -30,41 +30,50 @@ import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
 public class Classification extends JPanel implements ActionListener {
-    
     protected String name = "classification.rrd";
-    protected JButton submit;
     protected JCheckBox wBox,bBox,sBox,pBox,oBox;
+    protected Dimension d = this.getSize();
+    protected GUIGraphPanel graphPanel;
+    protected JButton submit;
     protected JFrame frame;
     protected JPanel panel;
-    protected Dimension d = this.getSize();
     protected ChartPanel p;
-    protected GUIGraphPanel graphPanel;
     
+    
+    /**
+     * 
+     * Default Constructor
+     * 
+     * @param f main frame
+     * 
+     * @throws RrdException
+     * @throws IOException
+     * 
+     */
     public Classification (JFrame f) throws RrdException, IOException {
         super(new GridLayout(1,2));
         JPanel j1 =  new JPanel(new GridLayout(2,3));
+        j1.setBorder(new TitledBorder("Options"));
         j1.setSize(f.getWidth()/2, 100);
         JPanel j2 = new JPanel();
-        j1.setBorder(new TitledBorder("Options"));
         
+        //Check Boxes
         wBox = new JCheckBox("WEB");
-        j1.add(wBox);
-        
-        bBox = new JCheckBox("BULK");
-        j1.add(bBox);
-        
         sBox = new JCheckBox("SERVICES");
-        j1.add(sBox);
-        
         pBox = new JCheckBox("P2P");
-        j1.add(pBox);
-        
+        bBox = new JCheckBox("BULK");
         oBox = new JCheckBox("OTHER");
+        j1.add(bBox);
+        j1.add(wBox);
+        j1.add(sBox);
+        j1.add(pBox);
         j1.add(oBox);
         
+        //Submit Button
         submit = new JButton("Submit");
         j2.add(submit);
         
+        //Add button and checkBoxes to panel
         add(j1);
         add(j2);
         submit.addActionListener(this);
@@ -74,9 +83,12 @@ public class Classification extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e){
         try {
-            RrdGraphDef graphDef = new RrdGraphDef();
+            //Get the time interval of 5 minutes
             Date endTime = new Date();
-            Date startTime = new Date(endTime.getTime() - 864000 * 10L);
+            Date startTime = new Date(endTime.getTime() - 300000);
+            
+            //Create graph according to the checkboxes
+            RrdGraphDef graphDef = new RrdGraphDef();
             graphDef.setTimePeriod(startTime, endTime);
             if (wBox.isSelected()){
                 graphDef.datasource("WEB", name, "WEB", "AVERAGE");
@@ -99,6 +111,7 @@ public class Classification extends JPanel implements ActionListener {
                 graphDef.area("OTHER", Color.BLACK, "OTHER");
             }
             
+            //Create graph pop-screen 
             RrdGraph graph = new RrdGraph(graphDef);
             graph.saveAsGIF("Classification.gif");
             graphPanel = new GUIGraphPanel(graph);
