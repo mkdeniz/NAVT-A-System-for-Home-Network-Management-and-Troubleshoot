@@ -14,13 +14,22 @@ import java.awt.event.*;
 
 public class About extends JDialog implements ActionListener {
     
-    JButton Close = new JButton("Close");
+    protected JButton Close = new JButton("Close");
+    protected JPanel panel = new JPanel();
     
+    /**
+     * 
+     * Default Constructor
+     * 
+     */
     public About() {
-        JPanel panel = new JPanel();
+        super();
+        
+        //Add Panel
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         getContentPane().add(panel, BorderLayout.CENTER);
         
+        //Create text area nad add it to panel
         JPanel textPanel = new JPanel();
         String strHelp = "Copyright 2014 - Mehmet Kemal Deniz\n\n" +
             "University of Glasgow - 4th Year Project" ;
@@ -33,11 +42,13 @@ public class About extends JDialog implements ActionListener {
         textPanel.add(textArea,BorderLayout.CENTER);
         panel.add(textPanel,BorderLayout.CENTER);
         
+        //Add clsoe button to panel
         JPanel buttonPanel = new JPanel();
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
         buttonPanel.add(Close);
         Close.addActionListener(this); 
         
+        //Make it visible
         setTitle("About");
         this.pack();
         setVisible(true);    
