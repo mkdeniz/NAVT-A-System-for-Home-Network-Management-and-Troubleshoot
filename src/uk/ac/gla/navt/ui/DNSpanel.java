@@ -12,7 +12,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import uk.ac.gla.navt.utilities.dnsTest;
+import uk.ac.gla.navt.utilities.DNS;
 import java.awt.GridLayout;
 import javax.swing.ImageIcon;
 import javax.swing.border.TitledBorder;
@@ -74,7 +74,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
             int suc = 0;
             String[] t2;
             String t,t1;
-            t = dnsTest.runTest("8.8.8.8","3");
+            t = DNS.runTest("8.8.8.8","3");
             if (t != null) {
                 t2 = t.split(",");
                 String[] result = t2[1].toString().split("");
@@ -93,7 +93,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
                 Results.add(l);
             }
             l.setVisible(true);
-            t = dnsTest.runTest("208.67.222.222","3");
+            t = DNS.runTest("208.67.222.222","3");
             if (t != null) {
                 t2 = t.split(",");
                 String[] result = t2[1].toString().split("");
@@ -114,7 +114,7 @@ public class DNSpanel extends JPanel implements ActionListener  {
             
             if (suc > 0) {
                 result = suc;    
-                t1 = dnsTest.runTest("www.google.com","3");
+                t1 = DNS.runTest("www.google.com","3");
                 if (t1 != null) {
                     t2 = t1.split(",");
                     l2 = new JLabel(t2[2]);

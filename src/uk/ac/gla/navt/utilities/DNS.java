@@ -3,7 +3,7 @@ package uk.ac.gla.navt.utilities;
 import java.io.*;
 import java.util.*;
 
-public class dnsTest {
+public class DNS {
     
     static Process process;
     
