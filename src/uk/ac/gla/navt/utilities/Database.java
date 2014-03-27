@@ -14,8 +14,6 @@ import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
-import org.jrobin.core.Sample;
-import org.jrobin.core.Util;
 import org.jrobin.graph.RrdGraphDef;
 
 public class Database {
@@ -32,7 +30,10 @@ public class Database {
      *
      * A method to create bandwidth database
      * 
-     * */
+     * @throws java.io.IOException
+     * @throws org.jrobin.core.RrdException 
+     * 
+     */
     public void prepareRRDB() throws IOException, RrdException {
         RrdDef rrdDef = new RrdDef("file.rrd", 5);
         rrdDef.addDatasource("download", "GAUGE", 2, Double.NaN, Double.NaN);
@@ -46,7 +47,10 @@ public class Database {
      *
      * A method to create classification database
      * 
-     * */
+     * @throws java.io.IOException
+     * @throws org.jrobin.core.RrdException 
+     *
+     */
     public void prepareRRDC() throws IOException, RrdException {
         RrdDef rrdDef = new RrdDef("classification.rrd");
         rrdDef.addDatasource("WEB", "GAUGE", 600, Double.NaN, Double.NaN);
@@ -62,7 +66,10 @@ public class Database {
      *
      * A method to create bandwidth graph
      * 
-     * */
+     * @return RRD graph definition
+     * @throws org.jrobin.core.RrdException 
+     *
+     */
     public RrdGraphDef prepareBandwith() throws RrdException {
         RrdGraphDef gDef = new RrdGraphDef();
         Date endTime = new Date();
@@ -82,7 +89,6 @@ public class Database {
         gDef.gprint("uload", "AVERAGE", "avg = @2 kb/s@l");
         gDef.time("@l@lTime period: @t", "MMM dd, yyyy    HH:mm:ss", startTime);
         gDef.time("to  @t@c", "HH:mm:ss");
-        gDef.close();
         return gDef;
     }
 }

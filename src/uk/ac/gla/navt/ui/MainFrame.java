@@ -40,7 +40,6 @@ import org.jrobin.graph.RrdGraphDef;
 public class MainFrame extends JFrame {
     
     protected GUIGraphPanel graphPanel;
-    protected String rrd = "file.rrd";
     protected DNSpanel dPanel;
     protected JFrame frame;
     protected JLabel clock;
@@ -97,7 +96,7 @@ public class MainFrame extends JFrame {
             
             //Preparing databases and graphs
             System.out.print("System is preparing databases:");
-            Database d = new Database(rrd);
+            Database d = new Database();
             d.prepareRRDB();
             d.prepareRRDC();
             
