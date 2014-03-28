@@ -1,5 +1,13 @@
 package uk.ac.gla.navt.process;
 
+/**
+ * A classifier class to provide algorithms and validations methods
+ * 
+ * @Author Mehmet Kemal Deniz
+ * @Date 27/03/2014
+
+*/
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -14,41 +22,43 @@ import net.sf.javaml.core.DenseInstance;
 import net.sf.javaml.core.Instance;
 import net.sf.javaml.tools.data.FileHandler;
 
-
-/**
- *
- * @author root
- */
 public class Classifier{
     
     Dataset data;
     NaiveBayesClassifier NB;
     KNearestNeighbors KNN;
     KDtreeKNN tKNN;
-            
+       
+    /**
+     *
+     * Default Constructor
+     * 
+     * 
+     * @throws java.io.IOException
+     */
     public Classifier() throws IOException {
-        data = FileHandler.loadDataset(new File("/home/mkdeniz/Desktop/formatted_flows.csv"), 4, ",");
+        data = FileHandler.loadDataset(new File("formatted_flows.csv"), 4, ",");
         for (Instance inst : data) {
         	inst.removeAttribute(0);
         	inst.removeAttribute(1);
         }
         NB = new NaiveBayesClassifier(true,true,false);
-        long start = System.currentTimeMillis();
         NB.buildClassifier(data);
-        long elapsedTime = System.currentTimeMillis() - start;
-        System.out.println("\n"+elapsedTime);
         KNN = new KNearestNeighbors(2);
-        start = System.currentTimeMillis();
         KNN.buildClassifier(data);
-        elapsedTime = System.currentTimeMillis() - start;
-        System.out.println("\n"+elapsedTime);
         tKNN = new KDtreeKNN(2);
     }
     
+    /**
+     *
+     * A method to classify a flows using k-NN
+     * 
+     * @param v variance
+     * @param m mean
+     * @return result
+     */
     public String KNNClassify(double m, double v) {
         double [] d = new double[2];
-        System.out.print(m);
-        System.out.print(v);
         d[0] = m;
         d[1] = v;
         Instance ins = new DenseInstance(d);
@@ -60,10 +70,16 @@ public class Classifier{
             return null;
     }
     
+    /**
+     *
+     * A method to classify flow using tree based tkNN
+     * 
+     * @param v variance
+     * @param m mean
+     * @return result
+     */
     public String tKNNClassify(double m, double v) {
         double [] d = new double[2];
-        System.out.print(m);
-        System.out.print(v);
         d[0] = m;
         d[1] = v;
         Instance ins = new DenseInstance(d);
@@ -71,6 +87,14 @@ public class Classifier{
         return predictedNB.toString();
     }
     
+    /**
+     *
+     * A method to classify flow using Naive Bayes
+     * 
+     * @param v variance
+     * @param m mean
+     * @return result
+     */
     public String NBClassify(double m, double v) {
         double [] d = new double[2];
         System.out.print(m);
@@ -82,6 +106,12 @@ public class Classifier{
         return predictedNB.toString();
     }
     
+    /**
+     *
+     * A method to cross validate k-NN using k
+     * 
+     * @return performance map
+     */
     public HashMap<Integer, Double> CrossValidationKNN() {
         HashMap<Integer,Double> hm = new HashMap<>();
         for (int k = 3; k < 5; k++ ) {
@@ -102,6 +132,12 @@ public class Classifier{
         return hm;
     }
     
+    /**
+     *
+     * A method to cross validate k-NN using k
+     * 
+     * @return performance map
+     */
     public double CrossValidationNB() {
         CrossValidation cv = new CrossValidation(NB);
         Map<Object, PerformanceMeasure> CV = cv.crossValidation(data);
@@ -111,21 +147,4 @@ public class Classifier{
         System.out.print(CV);
 	return d/CV.size();
     }
-    
-    public static void main(String[] args) throws IOException {
-        Classifier c = new Classifier();
-        long start = System.currentTimeMillis();
-        System.out.println("Accuracy of NB: " + c.CrossValidationNB());
-        long elapsedTime = System.currentTimeMillis() - start;
-        System.out.println("\n"+elapsedTime);
-        HashMap<Integer,Double> result = c.CrossValidationKNN();
-        System.out.println("Accuracy of KNN: ");
-        for (Integer key : result.keySet()) {
-            start = System.currentTimeMillis();
-            System.out.print("K="+key+" : "+result.get(key));
-            elapsedTime = System.currentTimeMillis() - start;
-            System.out.print(elapsedTime);
-        }
-    }
-    
 }

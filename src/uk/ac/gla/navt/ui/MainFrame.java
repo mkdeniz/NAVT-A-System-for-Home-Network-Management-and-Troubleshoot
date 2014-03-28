@@ -84,7 +84,7 @@ public class MainFrame extends JFrame {
      * 
      */
     public MainFrame(int n, String s){
-        super(s);
+        super("N.A.V.T");
         try {
             frame = this;
             //Preparing Menus

@@ -128,8 +128,8 @@ public class Worker implements Runnable{
                     
                     //Create the sample of current values and update graph
                     sample.setTime(Util.getTimestamp());
-                    sample.setValue("a", tmp);
-                    sample.setValue("b", tmp2);
+                    sample.setValue("download", tmp);
+                    sample.setValue("upload", tmp2);
                     statusBar.setText("D/L:"+tmp+" U/L"+tmp2);
                     sample.update();
                     Date endTime = new Date();

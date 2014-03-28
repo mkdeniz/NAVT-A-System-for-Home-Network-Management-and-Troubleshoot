@@ -53,11 +53,12 @@ public class Database {
      */
     public void prepareRRDC() throws IOException, RrdException {
         RrdDef rrdDef = new RrdDef("classification.rrd");
-        rrdDef.addDatasource("WEB", "GAUGE", 600, Double.NaN, Double.NaN);
-        rrdDef.addDatasource("BULK", "GAUGE", 600, Double.NaN, Double.NaN);
-        rrdDef.addDatasource("P2P", "GAUGE", 600, Double.NaN, Double.NaN);
-        rrdDef.addDatasource("SERVICE", "GAUGE", 600, Double.NaN, Double.NaN);
-        rrdDef.addArchive("AVERAGE", 0.5, 1, 1000);
+        rrdDef.addDatasource("WEB", "COUNTER", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("BULK", "COUNTER", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("P2P", "COUNTER", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("SERVICE", "COUNTER", 600, Double.NaN, Double.NaN);
+        rrdDef.addDatasource("OTHER", "COUNTER", 600, Double.NaN, Double.NaN);
+        rrdDef.addArchive("AVERAGE", 0.5, 4, 1000);
         RrdDb rrdDb = new RrdDb(rrdDef);
         rrdDb.close();
     }
@@ -85,8 +86,8 @@ public class Database {
         gDef.gprint("download", "AVERAGE", "avg = @2 kb/s@l");
         gDef.datasource("upload", "file.rrd", "upload", "AVERAGE", "MEMORY");
         gDef.area("upload", Color.GREEN, "Upload");
-        gDef.gprint("uploa", "MAX", "max = @2 kb/s");
-        gDef.gprint("uload", "AVERAGE", "avg = @2 kb/s@l");
+        gDef.gprint("upload", "MAX", "max = @2 kb/s");
+        gDef.gprint("upload", "AVERAGE", "avg = @2 kb/s@l");
         gDef.time("@l@lTime period: @t", "MMM dd, yyyy    HH:mm:ss", startTime);
         gDef.time("to  @t@c", "HH:mm:ss");
         return gDef;

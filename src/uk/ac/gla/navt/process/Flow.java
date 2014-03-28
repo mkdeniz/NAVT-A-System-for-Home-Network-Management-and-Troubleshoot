@@ -1,6 +1,5 @@
 package uk.ac.gla.navt.process;
 
-
 /**
  * A Flow object class to allow flow creation and statistical value calculation
  * such as variance and mean of the flow features.
@@ -9,7 +8,6 @@ package uk.ac.gla.navt.process;
  * @Date 27/03/2014
 
 */
-
 
 import java.util.ArrayList;
 import java.util.Date;
