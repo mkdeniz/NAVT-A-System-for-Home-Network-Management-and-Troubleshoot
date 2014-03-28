@@ -13,5 +13,3 @@ causes of anomalies when these occur. The system should operate out of a general
 the home gateway, and use callbacks to report usage statistics to trusted hosts. It should graphically visualise
 per-host network activity, and would ideally be extensible to accommodate new troubleshooting and diagnostic 
 operations.
-
-http://pastebin.com/rDa8nGwP
